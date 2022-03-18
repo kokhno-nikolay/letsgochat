@@ -2,11 +2,12 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"os"
+
+	_ "github.com/lib/pq"
 )
 
 const (
@@ -18,24 +19,12 @@ const (
 )
 
 func hello(w http.ResponseWriter, r *http.Request) {
-	io.WriteString(w, "Hello World")
-
-	pgConnString := fmt.Sprintf(
-		`host=%s port=%d user=%s password=%s dbname=%s sslmode=disable`,
-		PostgresHostName, PostgresPort, PostgresUsername, PostgresPassword, PostgresDatabaseName,
-	)
-
-	db, err := sql.Open("postgres", pgConnString)
+	_, err := NewClient()
 	if err != nil {
-		io.WriteString(w, "postgres: connected failed")
+		io.WriteString(w, "failed")
 	}
 
-	err = db.Ping()
-	if err != nil {
-		io.WriteString(w, "postgres: connected failed")
-	}
-
-	io.WriteString(w, "postgres: connected to database has been successfully")
+	io.WriteString(w, "success")
 }
 
 func main() {
@@ -43,4 +32,19 @@ func main() {
 	http.HandleFunc("/", hello)
 	log.Print("Listening on :" + port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
+}
+
+func NewClient() (*sql.DB, error) {
+	db, err := sql.Open("postgres", "postgres://idelciuumoufmw:58aab6636158c74dc63c7fcd4655701a65afc4cbbea04fddccde96deacc1bae5@ec2-54-228-97-176.eu-west-1.compute.amazonaws.com:5432/d74pjn9g01ncq1")
+	if err != nil {
+		return nil, err
+	}
+
+	err = db.Ping()
+	if err != nil {
+		return nil, err
+	}
+
+	log.Println("postgres: connected to database has been successfully")
+	return db, nil
 }
