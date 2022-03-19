@@ -9,5 +9,5 @@ func main() {
 	handler := api.NewHandler()
 	router := handler.Init()
 
-	router.Run(os.Getenv("PORT"))
+	router.Run(":" + os.Getenv("PORT"))
 }
