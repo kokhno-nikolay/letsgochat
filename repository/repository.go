@@ -8,26 +8,25 @@ import (
 )
 
 type Users interface {
-	FindByID(int) (models.User, error)
+	FindByUsername(username string) (models.User, error)
 	Create(user models.User) error
-	GetAllActive() ([]models.User, error)
-	SwitchToActive(int) error
-	SwitchToInactive(int) error
+	GetAllActiveUsers() ([]models.User, error)
 }
 
-type Messages interface {
-	GetAll() ([]models.Message, error)
-	Create(message models.Message) error
+type Token interface {
+	CheckToken(token string) (bool, error)
+	CreateToken(token models.Token) (models.Token, error)
+	DeleteToken(token string) error
 }
 
-type Repository struct {
-	Users    Users
-	Messages Messages
+type Repositories struct {
+	Users Users
+	Token Token
 }
 
-func NewRepository(db *sql.DB) *Repository {
-	return &Repository{
-		Users:    postgres.NewUsersRepo(db),
-		Messages: postgres.NewMessageRepo(db),
+func NewRepositories(db *sql.DB) *Repositories {
+	return &Repositories{
+		Users: postgres.NewUsersRepo(db),
+		Token: postgres.NewTokenRepo(db),
 	}
 }

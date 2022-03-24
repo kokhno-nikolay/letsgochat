@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Chat example</title>
+    <script src="index.js" defer></script>
+</head>
+<body>
+<div class="header">
+    <h2>Chat example page</h2>
+</div>
+
+<div class="chat-form">
+    <label for="chat_inp">Enter message: </label>
+    <input type="text" id="chat_inp" name="chat-inp" onblur="getVal()">
+    <button id="form-submit">Send</button>
+</div>
+
+<div class="server-response">
+    <p>Received: <span id="res">please enter your message.</span></p>
+</div>
+</body>
+</html>
