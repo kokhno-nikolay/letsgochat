@@ -52,6 +52,15 @@ func (r *UsersRepo) Create(user models.User) error {
 	return err
 }
 
+func (r *UsersRepo) UserExists(username string) (bool, error) {
+	var exists bool
+
+	row := r.db.QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE username = $1)", username)
+	err := row.Scan(&exists)
+
+	return exists, err
+}
+
 func (r *UsersRepo) GetAllActiveUsers() ([]models.User, error) {
 	users := []models.User{}
 	rows, err := r.db.Query("SELECT username FROM users JOIN tokens ON tokens.user_id = users.id;")

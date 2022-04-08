@@ -49,10 +49,29 @@ func (h *Handler) SignIn(c *gin.Context) {
 		return
 	}
 
-	user, err := h.UserRepo.FindByUsername(inp.Username)
+	userExists, err := h.UserRepo.UserExists(inp.Username)
 	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code":  http.StatusInternalServerError,
+			"error": err.Error(),
+		})
+
+		return
+	}
+
+	if !userExists {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code":  http.StatusBadRequest,
+			"error": "user does not exist",
+		})
+
+		return
+	}
+
+	user, err := h.UserRepo.FindByUsername(inp.Username)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code":  http.StatusInternalServerError,
 			"error": err.Error(),
 		})
 
