@@ -15,7 +15,44 @@ func (h *Handler) SignUp(c *gin.Context) {
 	if err := c.BindJSON(&inp); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code":    http.StatusBadRequest,
-			"message": "invalid input body",
+			"message": "invalid input request",
+		})
+
+		return
+	}
+
+	if len(inp.Username) < 4 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": "username is too short",
+		})
+
+		return
+	}
+
+	if len(inp.Password) < 8 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": "password is too short",
+		})
+
+		return
+	}
+
+	userExists, err := h.UserRepo.UserExists(inp.Username)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code":    http.StatusInternalServerError,
+			"message": err.Error(),
+		})
+
+		return
+	}
+
+	if userExists {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": fmt.Sprintf("User with userName %s already exists", inp.Username),
 		})
 
 		return
@@ -34,6 +71,7 @@ func (h *Handler) SignUp(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"code":    http.StatusOK,
 		"message": "user created successfully",
+		"data":    inp,
 	})
 }
 
@@ -41,9 +79,9 @@ func (h *Handler) SignIn(c *gin.Context) {
 	var inp models.UserInput
 
 	if err := c.BindJSON(&inp); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"code":    http.StatusBadRequest,
-			"message": "invalid input body",
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code":    http.StatusInternalServerError,
+			"message": "input decoding error",
 		})
 
 		return
@@ -52,8 +90,8 @@ func (h *Handler) SignIn(c *gin.Context) {
 	userExists, err := h.UserRepo.UserExists(inp.Username)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"code":  http.StatusInternalServerError,
-			"error": err.Error(),
+			"code":    http.StatusInternalServerError,
+			"message": err.Error(),
 		})
 
 		return
@@ -61,8 +99,8 @@ func (h *Handler) SignIn(c *gin.Context) {
 
 	if !userExists {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"code":  http.StatusBadRequest,
-			"error": "user does not exist",
+			"code":    http.StatusBadRequest,
+			"message": "user does not exist",
 		})
 
 		return
@@ -71,8 +109,8 @@ func (h *Handler) SignIn(c *gin.Context) {
 	user, err := h.UserRepo.FindByUsername(inp.Username)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"code":  http.StatusInternalServerError,
-			"error": err.Error(),
+			"code":    http.StatusInternalServerError,
+			"message": err.Error(),
 		})
 
 		return
