@@ -1,7 +1,8 @@
 package api
 
 import (
-	"log"
+	"github.com/kokhno-nikolay/letsgochat/middlewares"
+	"github.com/sirupsen/logrus"
 	"net/http"
 	"os"
 
@@ -36,6 +37,9 @@ func (h *Handler) Init() *gin.Engine {
 		gin.Logger(),
 	)
 
+	log := logrus.New()
+
+	router.Use(middlewares.Logger(log), gin.Recovery())
 	router.GET("/ping", func(c *gin.Context) {
 		c.String(http.StatusOK, "pong")
 	})
