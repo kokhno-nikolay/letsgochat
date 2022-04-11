@@ -52,7 +52,7 @@ func (h *Handler) SignUp(c *gin.Context) {
 	if userExists {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code":    http.StatusBadRequest,
-			"message": fmt.Sprintf("User with userName %s already exists", inp.Username),
+			"message": fmt.Sprintf("user with username %s already exists", inp.Username),
 		})
 
 		return
@@ -87,6 +87,24 @@ func (h *Handler) SignIn(c *gin.Context) {
 		return
 	}
 
+	if len(inp.Username) < 4 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": "username is too short",
+		})
+
+		return
+	}
+
+	if len(inp.Password) < 8 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": "password is too short",
+		})
+
+		return
+	}
+
 	userExists, err := h.UserRepo.UserExists(inp.Username)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -116,12 +134,21 @@ func (h *Handler) SignIn(c *gin.Context) {
 		return
 	}
 
+	if user.Password != inp.Password {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": "password is invalid",
+		})
+
+		return
+	}
+
 	t := models.Token{UUID: uuid.New(), UserId: user.ID}
 	token, err := h.TokenRepo.CreateToken(t)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code":    http.StatusInternalServerError,
-			"message": "token creation error: " + err.Error(),
+			"message": err.Error(),
 		})
 
 		return
