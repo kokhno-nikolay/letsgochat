@@ -52,13 +52,13 @@ func (r *UsersRepo) Create(user models.User) error {
 	return err
 }
 
-func (r *UsersRepo) UserExists(username string) (bool, error) {
-	var exists bool
+func (r *UsersRepo) UserExists(username string) (int, error) {
+	var count int
 
-	row := r.db.QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE username = $1)", username)
-	err := row.Scan(&exists)
+	row := r.db.QueryRow("SELECT count(*) from users WHERE username = $1", username)
+	err := row.Scan(&count)
 
-	return exists, err
+	return count, err
 }
 
 func (r *UsersRepo) GetAllActiveUsers() ([]models.User, error) {

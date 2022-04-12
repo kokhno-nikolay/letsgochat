@@ -2,9 +2,10 @@ package api
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"net/http"
 
 	"github.com/kokhno-nikolay/letsgochat/models"
 )
@@ -49,7 +50,7 @@ func (h *Handler) SignUp(c *gin.Context) {
 		return
 	}
 
-	if userExists {
+	if userExists >= 1 {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code":    http.StatusBadRequest,
 			"message": fmt.Sprintf("user with username %s already exists", inp.Username),
@@ -115,7 +116,7 @@ func (h *Handler) SignIn(c *gin.Context) {
 		return
 	}
 
-	if !userExists {
+	if userExists <= 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code":    http.StatusBadRequest,
 			"message": "user does not exist",

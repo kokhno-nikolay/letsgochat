@@ -11,7 +11,7 @@ type Users interface {
 	FindByUsername(username string) (models.User, error)
 	Create(user models.User) error
 	GetAllActiveUsers() ([]models.User, error)
-	UserExists(username string) (bool, error)
+	UserExists(username string) (int, error)
 }
 
 type Token interface {
