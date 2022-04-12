@@ -14,20 +14,12 @@ type Users interface {
 	UserExists(username string) (int, error)
 }
 
-type Token interface {
-	CheckToken(token string) (bool, error)
-	CreateToken(token models.Token) (models.Token, error)
-	DeleteToken(token string) error
-}
-
 type Repositories struct {
 	Users Users
-	Token Token
 }
 
 func NewRepositories(db *sql.DB) *Repositories {
 	return &Repositories{
 		Users: postgres.NewUsersRepo(db),
-		Token: postgres.NewTokenRepo(db),
 	}
 }

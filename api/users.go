@@ -70,8 +70,7 @@ func (h *Handler) SignUp(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"code":    http.StatusOK,
-		"message": "user created successfully",
-		"data":    inp,
+		"message": fmt.Sprintf("user with username %s successfully created", inp.Username),
 	})
 }
 

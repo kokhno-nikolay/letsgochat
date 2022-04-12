@@ -12,10 +12,9 @@ import (
 )
 
 type Handler struct {
-	UserRepo  repository.Users
-	TokenRepo repository.Token
-	Sessions  map[string]int
-	Host      string
+	UserRepo repository.Users
+	Sessions map[string]int
+	Host     string
 }
 
 type Deps struct {
@@ -24,10 +23,9 @@ type Deps struct {
 
 func NewHandler(deps Deps) *Handler {
 	return &Handler{
-		UserRepo:  deps.Repos.Users,
-		TokenRepo: deps.Repos.Token,
-		Sessions:  make(map[string]int),
-		Host:      os.Getenv("HOST_NAME"),
+		UserRepo: deps.Repos.Users,
+		Sessions: make(map[string]int),
+		Host:     os.Getenv("HOST_NAME"),
 	}
 }
 
