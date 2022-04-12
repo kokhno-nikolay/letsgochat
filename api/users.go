@@ -144,18 +144,10 @@ func (h *Handler) SignIn(c *gin.Context) {
 		return
 	}
 
-	t := models.Token{UUID: uuid.New(), UserId: user.ID}
-	token, err := h.TokenRepo.CreateToken(t)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"code":    http.StatusInternalServerError,
-			"message": err.Error(),
-		})
+	token := uuid.New().String()
+	h.Sessions[token] = user.ID
 
-		return
-	}
-
-	url := fmt.Sprintf("ws://%s/chat?token=%s", h.Host, token.UUID.String())
+	url := fmt.Sprintf("ws://%s/chat?token=%s", h.Host, token)
 	c.JSON(http.StatusOK, gin.H{
 		"url": url,
 	})

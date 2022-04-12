@@ -1,6 +1,6 @@
 var submit_btn = document.getElementById("form-submit")
 var chat_inp = document.getElementById("chat_inp")
-var socket = new WebSocket("ws://letsgochat.herokuapp.com/chat?token=4e4e4a66-ab92-43a7-9a6a-44d5c67a1b3a");
+var socket = new WebSocket("ws://letsgochat.herokuapp.com/chat?token=23fddf65-f18f-4674-92a8-d8869bd13f7e");
 
 socket.onopen = () => {
     console.log("Successfully connected from ws server");

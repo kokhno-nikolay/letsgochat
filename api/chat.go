@@ -43,3 +43,15 @@ func reader(conn *websocket.Conn) {
 		}
 	}
 }
+
+func (h *Handler) checkToken(token string) bool {
+	_, ok := h.Sessions[token]
+	return ok
+}
+
+func (h *Handler) deleteToken(token string) {
+	_, ok := h.Sessions[token]
+	if ok {
+		delete(h.Sessions, token)
+	}
+}

@@ -14,6 +14,7 @@ import (
 type Handler struct {
 	UserRepo  repository.Users
 	TokenRepo repository.Token
+	Sessions  map[string]int
 	Host      string
 }
 
@@ -25,6 +26,7 @@ func NewHandler(deps Deps) *Handler {
 	return &Handler{
 		UserRepo:  deps.Repos.Users,
 		TokenRepo: deps.Repos.Token,
+		Sessions:  make(map[string]int),
 		Host:      os.Getenv("HOST_NAME"),
 	}
 }
@@ -56,23 +58,13 @@ func (h *Handler) Init() *gin.Engine {
 			return
 		}
 
-		ok, err := h.TokenRepo.CheckToken(token)
-		if err != nil {
-			c.String(http.StatusInternalServerError, "token cannot be validated")
-			return
-		}
-
-		if !ok {
+		if ok := h.checkToken(token); !ok {
 			c.String(http.StatusBadRequest, "token invalid")
 			return
 		}
 
 		defer func() {
-			if err := h.TokenRepo.DeleteToken(token); err != nil {
-				c.String(http.StatusInternalServerError, "token cannot be validated")
-				return
-			}
-
+			h.deleteToken(token)
 			log.Println("token deleted successfully")
 		}()
 

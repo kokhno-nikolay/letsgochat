@@ -4,9 +4,10 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"time"
+
 	"github.com/jackc/pgerrcode"
 	"github.com/lib/pq"
-	"time"
 
 	"github.com/kokhno-nikolay/letsgochat/models"
 )
