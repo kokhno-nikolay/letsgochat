@@ -55,3 +55,13 @@ func (h *Handler) deleteToken(token string) {
 		delete(h.Sessions, token)
 	}
 }
+
+func (h *Handler) checkUserSession(userId int) (bool, string) {
+	for key, value := range h.Sessions {
+		if value == userId {
+			return true, key
+		}
+	}
+
+	return false, ""
+}

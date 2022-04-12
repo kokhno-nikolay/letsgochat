@@ -2,11 +2,10 @@ package api
 
 import (
 	"fmt"
+	"github.com/google/uuid"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
-
 	"github.com/kokhno-nikolay/letsgochat/models"
 )
 
@@ -144,8 +143,14 @@ func (h *Handler) SignIn(c *gin.Context) {
 		return
 	}
 
-	token := uuid.New().String()
-	h.Sessions[token] = user.ID
+	var token string
+	tokenExists, t := h.checkUserSession(user.ID)
+	if !tokenExists {
+		token = uuid.New().String()
+		h.Sessions[token] = user.ID
+	} else {
+		token = t
+	}
 
 	url := fmt.Sprintf("ws://%s/chat?token=%s", h.Host, token)
 	c.JSON(http.StatusOK, gin.H{
