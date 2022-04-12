@@ -45,19 +45,27 @@ func reader(conn *websocket.Conn) {
 }
 
 func (h *Handler) checkToken(token string) bool {
-	_, ok := h.Sessions[token]
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
+	_, ok := h.sessions[token]
 	return ok
 }
 
 func (h *Handler) deleteToken(token string) {
-	_, ok := h.Sessions[token]
+	_, ok := h.sessions[token]
 	if ok {
-		delete(h.Sessions, token)
+		h.mu.Lock()
+		delete(h.sessions, token)
+		h.mu.Unlock()
 	}
 }
 
 func (h *Handler) checkUserSession(userId int) (bool, string) {
-	for key, value := range h.Sessions {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
+	for key, value := range h.sessions {
 		if value == userId {
 			return true, key
 		}

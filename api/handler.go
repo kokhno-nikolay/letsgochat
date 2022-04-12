@@ -1,20 +1,21 @@
 package api
 
 import (
+	"github.com/gin-gonic/gin"
 	"github.com/kokhno-nikolay/letsgochat/middlewares"
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"os"
-
-	"github.com/gin-gonic/gin"
+	"sync"
 
 	"github.com/kokhno-nikolay/letsgochat/repository"
 )
 
 type Handler struct {
-	UserRepo repository.Users
-	Sessions map[string]int
-	Host     string
+	userRepo repository.Users
+	sessions map[string]int
+	host     string
+	mu       sync.Mutex
 }
 
 type Deps struct {
@@ -23,9 +24,9 @@ type Deps struct {
 
 func NewHandler(deps Deps) *Handler {
 	return &Handler{
-		UserRepo: deps.Repos.Users,
-		Sessions: make(map[string]int),
-		Host:     os.Getenv("HOST_NAME"),
+		userRepo: deps.Repos.Users,
+		sessions: make(map[string]int),
+		host:     os.Getenv("HOST_NAME"),
 	}
 }
 

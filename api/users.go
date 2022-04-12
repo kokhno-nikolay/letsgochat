@@ -39,7 +39,7 @@ func (h *Handler) SignUp(c *gin.Context) {
 		return
 	}
 
-	userExists, err := h.UserRepo.UserExists(inp.Username)
+	userExists, err := h.userRepo.UserExists(inp.Username)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code":    http.StatusInternalServerError,
@@ -59,7 +59,7 @@ func (h *Handler) SignUp(c *gin.Context) {
 	}
 
 	user := models.User{Username: inp.Username, Password: inp.Password, Active: false}
-	if err := h.UserRepo.Create(user); err != nil {
+	if err := h.userRepo.Create(user); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code":    http.StatusInternalServerError,
 			"message": "something went wrong, please try again. Error: " + err.Error(),
@@ -104,7 +104,7 @@ func (h *Handler) SignIn(c *gin.Context) {
 		return
 	}
 
-	userExists, err := h.UserRepo.UserExists(inp.Username)
+	userExists, err := h.userRepo.UserExists(inp.Username)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code":    http.StatusInternalServerError,
@@ -123,7 +123,7 @@ func (h *Handler) SignIn(c *gin.Context) {
 		return
 	}
 
-	user, err := h.UserRepo.FindByUsername(inp.Username)
+	user, err := h.userRepo.FindByUsername(inp.Username)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code":    http.StatusInternalServerError,
@@ -146,12 +146,14 @@ func (h *Handler) SignIn(c *gin.Context) {
 	tokenExists, t := h.checkUserSession(user.ID)
 	if !tokenExists {
 		token = uuid.New().String()
-		h.Sessions[token] = user.ID
+		h.mu.Lock()
+		h.sessions[token] = user.ID
+		h.mu.Unlock()
 	} else {
 		token = t
 	}
 
-	url := fmt.Sprintf("ws://%s/chat?token=%s", h.Host, token)
+	url := fmt.Sprintf("ws://%s/chat?token=%s", h.host, token)
 	c.JSON(http.StatusOK, gin.H{
 		"url": url,
 	})
@@ -160,7 +162,7 @@ func (h *Handler) SignIn(c *gin.Context) {
 func (h *Handler) GetActiveUsers(c *gin.Context) {
 	var res []string
 
-	users, err := h.UserRepo.GetAllActiveUsers()
+	users, err := h.userRepo.GetAllActiveUsers()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code":    http.StatusInternalServerError,
