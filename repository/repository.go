@@ -16,12 +16,19 @@ type Users interface {
 	SwitchToInactive(userID int) error
 }
 
+type Messages interface {
+	GetAll() ([]models.MessageInp, error)
+	Create(message models.Message) error
+}
+
 type Repositories struct {
-	Users Users
+	Users    Users
+	Messages Messages
 }
 
 func NewRepositories(db *sql.DB) *Repositories {
 	return &Repositories{
-		Users: postgres.NewUsersRepo(db),
+		Users:    postgres.NewUsersRepo(db),
+		Messages: postgres.NewMessagesRepo(db),
 	}
 }
