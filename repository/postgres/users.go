@@ -62,9 +62,13 @@ func (r *UsersRepo) UserExists(username string) (int, error) {
 	return count, err
 }
 
-func (r *UsersRepo) GetAllActiveUsers() ([]models.User, error) {
-	users := []models.User{}
-	rows, err := r.db.Query("SELECT username FROM users JOIN tokens ON tokens.user_id = users.id;")
+func (r *UsersRepo) GetAllActive() ([]models.User, error) {
+	users := make([]models.User, 0)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	rows, err := r.db.QueryContext(ctx, "SELECT id, username FROM users WHERE active = true")
 	if err != nil {
 		return nil, err
 	}
@@ -72,14 +76,44 @@ func (r *UsersRepo) GetAllActiveUsers() ([]models.User, error) {
 
 	for rows.Next() {
 		user := models.User{}
-		if err := rows.Scan(&user.Username); err != nil {
+
+		err = rows.Scan(&user.ID, &user.Username)
+		if err != nil {
 			return nil, err
 		}
+
 		users = append(users, user)
-	}
-	if err = rows.Err(); err != nil {
-		return nil, err
 	}
 
 	return users, nil
+}
+
+func (r *UsersRepo) SwitchToActive(userID int) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	query := "UPDATE users SET active = true WHERE id = $1"
+	stmt, err := r.db.PrepareContext(ctx, query)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.ExecContext(ctx, userID)
+	return err
+}
+
+func (r *UsersRepo) SwitchToInactive(userID int) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	query := "UPDATE users SET active = false WHERE id = $1"
+	stmt, err := r.db.PrepareContext(ctx, query)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.ExecContext(ctx, userID)
+	return err
 }

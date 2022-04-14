@@ -153,6 +153,14 @@ func (h *Handler) SignIn(c *gin.Context) {
 		token = t
 	}
 
+	if err := h.userRepo.SwitchToActive(user.ID); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+
+		return
+	}
+
 	url := fmt.Sprintf("ws://%s/chat?token=%s", h.host, token)
 	c.JSON(http.StatusOK, gin.H{
 		"url": url,
@@ -162,7 +170,7 @@ func (h *Handler) SignIn(c *gin.Context) {
 func (h *Handler) GetActiveUsers(c *gin.Context) {
 	var res []string
 
-	users, err := h.userRepo.GetAllActiveUsers()
+	users, err := h.userRepo.GetAllActive()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code":    http.StatusInternalServerError,

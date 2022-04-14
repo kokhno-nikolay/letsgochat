@@ -1,13 +1,14 @@
 package api
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/kokhno-nikolay/letsgochat/middlewares"
-	"github.com/sirupsen/logrus"
 	"net/http"
 	"os"
 	"sync"
 
+	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
+
+	"github.com/kokhno-nikolay/letsgochat/middlewares"
 	"github.com/kokhno-nikolay/letsgochat/repository"
 )
 

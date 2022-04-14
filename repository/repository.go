@@ -10,8 +10,10 @@ import (
 type Users interface {
 	FindByUsername(username string) (models.User, error)
 	Create(user models.User) error
-	GetAllActiveUsers() ([]models.User, error)
 	UserExists(username string) (int, error)
+	GetAllActive() ([]models.User, error)
+	SwitchToActive(userID int) error
+	SwitchToInactive(userID int) error
 }
 
 type Repositories struct {

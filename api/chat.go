@@ -19,7 +19,7 @@ func (h *Handler) Chat(w http.ResponseWriter, r *http.Request, token string) {
 
 	ws, err := wsUpgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Println("Failed to set websocket upgrade: %+v", err)
+		log.Println("Failed to set websocket upgrade: ", err.Error())
 		return
 	}
 	defer func() {
@@ -52,13 +52,19 @@ func (h *Handler) checkToken(token string) bool {
 	return ok
 }
 
-func (h *Handler) deleteToken(token string) {
+func (h *Handler) deleteToken(token string) error {
+	if err := h.userRepo.SwitchToInactive(h.sessions[token]); err != nil {
+		return err
+	}
+
 	_, ok := h.sessions[token]
 	if ok {
 		h.mu.Lock()
 		delete(h.sessions, token)
 		h.mu.Unlock()
 	}
+
+	return nil
 }
 
 func (h *Handler) checkUserSession(userId int) (bool, string) {
