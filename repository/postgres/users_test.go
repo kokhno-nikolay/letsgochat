@@ -52,3 +52,45 @@ func TestUsersRepo_TestCreate(t *testing.T) {
 	err := repo.Users.Create(u)
 	assert.NoError(t, err)
 }
+
+func TestUsersRepo_GetAllActive(t *testing.T) {
+	db, mock := NewMock()
+	repo := repository.NewRepositories(db)
+
+	query := "SELECT id, username FROM users WHERE active = true"
+	rows := sqlmock.NewRows([]string{"id", "username"}).
+		AddRow(u.ID, u.Username)
+
+	mock.ExpectQuery(query).WillReturnRows(rows)
+
+	users, err := repo.Users.GetAllActive()
+	assert.NotEmpty(t, users)
+	assert.NoError(t, err)
+	assert.Len(t, users, 1)
+}
+
+func TestUsersRepo_SwitchToActive(t *testing.T) {
+	db, mock := NewMock()
+	repo := repository.NewRepositories(db)
+
+	query := "UPDATE users SET active = true WHERE id = $1"
+
+	prep := mock.ExpectPrepare(query)
+	prep.ExpectExec().WithArgs(u.ID).WillReturnResult(sqlmock.NewResult(0, 1))
+
+	err := repo.Users.SwitchToActive(u.ID)
+	assert.Error(t, err)
+}
+
+func TestUsersRepo_SwitchToInactive(t *testing.T) {
+	db, mock := NewMock()
+	repo := repository.NewRepositories(db)
+
+	query := "UPDATE users SET active = false WHERE id = $1"
+
+	prep := mock.ExpectPrepare(query)
+	prep.ExpectExec().WithArgs(u.ID).WillReturnResult(sqlmock.NewResult(0, 1))
+
+	err := repo.Users.SwitchToInactive(u.ID)
+	assert.Error(t, err)
+}
