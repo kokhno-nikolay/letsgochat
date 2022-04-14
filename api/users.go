@@ -2,10 +2,11 @@ package api
 
 import (
 	"fmt"
-	"github.com/google/uuid"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+
 	"github.com/kokhno-nikolay/letsgochat/models"
 )
 
