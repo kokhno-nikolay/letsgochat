@@ -16,7 +16,7 @@ var msg = models.Message{
 	UserId: 13903,
 }
 
-var msgInp = models.MessageInp{
+var msgInp = models.ChatMessage{
 	Text:     "Random text message",
 	Username: "test",
 }

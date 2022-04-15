@@ -144,7 +144,7 @@ func (h *Handler) SignIn(c *gin.Context) {
 	}
 
 	var token string
-	tokenExists, t := h.checkUserSession(user.ID)
+	tokenExists, t := h.CheckUserSession(user.ID)
 	if !tokenExists {
 		token = uuid.New().String()
 		h.mu.Lock()
@@ -162,7 +162,7 @@ func (h *Handler) SignIn(c *gin.Context) {
 		return
 	}
 
-	url := fmt.Sprintf("ws://%s/chat?token=%s", h.host, token)
+	url := fmt.Sprintf("wss://%s/chat?token=%s", h.host, token)
 	c.JSON(http.StatusOK, gin.H{
 		"url": url,
 	})

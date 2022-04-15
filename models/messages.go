@@ -6,7 +6,7 @@ type Message struct {
 	UserId int    `json:"user_id"`
 }
 
-type MessageInp struct {
+type ChatMessage struct {
 	Text     string `json:"text"`
 	Username string `json:"username"`
 }

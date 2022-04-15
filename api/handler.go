@@ -6,17 +6,22 @@ import (
 	"sync"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
 
 	"github.com/kokhno-nikolay/letsgochat/middlewares"
+	"github.com/kokhno-nikolay/letsgochat/models"
 	"github.com/kokhno-nikolay/letsgochat/repository"
 )
 
 type Handler struct {
-	userRepo repository.Users
-	sessions map[string]int
-	host     string
-	mu       sync.Mutex
+	userRepo    repository.Users
+	messageRepo repository.Messages
+	sessions    map[string]int
+	clients     map[*websocket.Conn]bool
+	broadcaster chan models.ChatMessage
+	host        string
+	mu          sync.Mutex
 }
 
 type Deps struct {
@@ -25,9 +30,12 @@ type Deps struct {
 
 func NewHandler(deps Deps) *Handler {
 	return &Handler{
-		userRepo: deps.Repos.Users,
-		sessions: make(map[string]int),
-		host:     os.Getenv("HOST_NAME"),
+		userRepo:    deps.Repos.Users,
+		messageRepo: deps.Repos.Messages,
+		sessions:    make(map[string]int),
+		clients:     make(map[*websocket.Conn]bool),
+		broadcaster: make(chan models.ChatMessage),
+		host:        os.Getenv("HOST_NAME"),
 	}
 }
 
@@ -46,6 +54,11 @@ func (h *Handler) Init() *gin.Engine {
 		c.String(http.StatusOK, "pong")
 	})
 
+	router.LoadHTMLGlob("templates/*")
+	router.GET("/", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "index.html", nil)
+	})
+
 	/* User handlers */
 	router.POST("/user", h.SignUp)
 	router.POST("/user/login", h.SignIn)
@@ -58,17 +71,18 @@ func (h *Handler) Init() *gin.Engine {
 			return
 		}
 
-		if ok := h.checkToken(token); !ok {
+		if ok := h.CheckUserToken(token); !ok {
 			c.String(http.StatusBadRequest, "token invalid")
 			return
 		}
 
 		defer func() {
-			h.deleteToken(token)
+			h.DeleteSession(token)
 			log.Println("token deleted successfully")
 		}()
 
-		h.Chat(c.Writer, c.Request, token)
+		go h.handleMessages(token)
+		h.handleConnections(c.Writer, c.Request)
 	})
 
 	return router

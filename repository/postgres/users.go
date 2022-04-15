@@ -22,6 +22,15 @@ func NewUsersRepo(db *sql.DB) *UsersRepo {
 	}
 }
 
+func (r *UsersRepo) FindById(id int) (models.User, error) {
+	user := models.User{}
+
+	row := r.db.QueryRow("SELECT id, username, password, active  FROM users WHERE id = $1", id)
+	err := row.Scan(&user.ID, &user.Username, &user.Password, &user.Active)
+
+	return user, err
+}
+
 func (r *UsersRepo) FindByUsername(username string) (models.User, error) {
 	user := models.User{}
 

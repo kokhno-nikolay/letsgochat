@@ -8,6 +8,7 @@ import (
 )
 
 type Users interface {
+	FindById(id int) (models.User, error)
 	FindByUsername(username string) (models.User, error)
 	Create(user models.User) error
 	UserExists(username string) (int, error)
@@ -17,7 +18,7 @@ type Users interface {
 }
 
 type Messages interface {
-	GetAll() ([]models.MessageInp, error)
+	GetAll() ([]models.ChatMessage, error)
 	Create(message models.Message) error
 }
 

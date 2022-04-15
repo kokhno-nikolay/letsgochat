@@ -1,6 +1,6 @@
 var submit_btn = document.getElementById("form-submit")
 var chat_inp = document.getElementById("chat_inp")
-var socket = new WebSocket("ws://letsgochat.herokuapp.com/chat?token=23fddf65-f18f-4674-92a8-d8869bd13f7e");
+var socket = new WebSocket("ws://letsgochat.herokuapp.com/chat?token=6bda2cbf-b778-4ae2-b7d4-354f0616c94b");
 
 socket.onopen = () => {
     console.log("Successfully connected from ws server");
@@ -13,12 +13,14 @@ socket.onclose = event => {
 
 socket.onerror = error => {
     console.log("Socket error: ", error);
-    document.write('<html><body>invalid token</body></html>')
+    sdocument.write('<html><body>invalid token</body></html>')
 };
 
 socket.onmessage = function(event) {
-    var out = document.getElementById('res');
-    out.innerHTML = event.data;
+    let data = JSON.parse(event.data);
+    let out = document.getElementById('messages');
+    let chatContent = `<p><strong>${data.username}</strong>: ${data.text}</p>`;
+    out.innerHTML += chatContent
 }
 
 submit_btn.addEventListener('click', function () {

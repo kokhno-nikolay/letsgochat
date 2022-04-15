@@ -17,8 +17,8 @@ func NewMessagesRepo(db *sql.DB) *MessagesRepo {
 	}
 }
 
-func (r *MessagesRepo) GetAll() ([]models.MessageInp, error) {
-	messages := make([]models.MessageInp, 0)
+func (r *MessagesRepo) GetAll() ([]models.ChatMessage, error) {
+	messages := make([]models.ChatMessage, 0)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -30,7 +30,7 @@ func (r *MessagesRepo) GetAll() ([]models.MessageInp, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		message := models.MessageInp{}
+		message := models.ChatMessage{}
 
 		err = rows.Scan(&message.Text, &message.Username)
 		if err != nil {
