@@ -48,8 +48,6 @@ func (h *Handler) handleConnections(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) messageClient(client *websocket.Conn, msg models.ChatMessage) {
-	log.Println("MESSAGE: ", msg)
-
 	err := client.WriteJSON(msg)
 	if err != nil && h.unsafeError(err) {
 		log.Printf("error: %v", err)
@@ -60,8 +58,6 @@ func (h *Handler) messageClient(client *websocket.Conn, msg models.ChatMessage) 
 
 func (h *Handler) messageClients(msg models.ChatMessage) {
 	for client := range h.clients {
-		log.Println("CLIENTS MESSAGE: ", msg)
-
 		h.messageClient(client, msg)
 	}
 }
@@ -84,6 +80,7 @@ func (h *Handler) handleMessages(token string) {
 			log.Fatal(err.Error())
 		}
 
+		msg.Username = user.Username
 		h.messageClients(msg)
 	}
 }
