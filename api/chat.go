@@ -43,6 +43,11 @@ func (h *Handler) handleConnections(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 
+		if len(msg.Text) < 1 {
+			log.Println("incorrect message text")
+			continue
+		}
+
 		h.broadcaster <- msg
 	}
 }

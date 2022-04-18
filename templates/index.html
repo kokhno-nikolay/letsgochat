@@ -21,8 +21,20 @@
     let chat_inp = document.getElementById("chat_inp")
 
     const sendMessage = () => {
-        socket.send(JSON.stringify({text: chat_inp.value}));
+        if (chat_inp.value.length > 1) {
+            socket.send(JSON.stringify({text: chat_inp.value}));
+            chat_inp.value = ""
+        } else {
+            alert("please enter your message")
+        }
     }
+
+    chat_inp.addEventListener("keyup", function (event) {
+        if (event.keyCode === 13) {
+            event.preventDefault();
+            sendMessage()
+        }
+    })
 
     socket.onopen = () => {
         console.log("Successfully connected from ws server");
@@ -39,8 +51,6 @@
     };
 
     socket.onmessage = function(event) {
-        console.log(event.data)
-
         let data = JSON.parse(event.data);
         let out = document.getElementById('messages');
         let chatContent = `<p><strong>${data.username}</strong>: ${data.text}</p>`;
