@@ -148,7 +148,7 @@ func (h *Handler) SignIn(c *gin.Context) {
 	if !tokenExists {
 		token = uuid.New().String()
 		h.mu.Lock()
-		h.sessions[token] = user.ID
+		h.Sessions[token] = user.ID
 		h.mu.Unlock()
 	} else {
 		token = t

@@ -17,7 +17,7 @@ import (
 type Handler struct {
 	userRepo    repository.Users
 	messageRepo repository.Messages
-	sessions    map[string]int
+	Sessions    map[string]int
 	clients     map[*websocket.Conn]bool
 	broadcaster chan models.ChatMessage
 	host        string
@@ -32,7 +32,7 @@ func NewHandler(deps Deps) *Handler {
 	return &Handler{
 		userRepo:    deps.Repos.Users,
 		messageRepo: deps.Repos.Messages,
-		sessions:    make(map[string]int),
+		Sessions:    make(map[string]int),
 		clients:     make(map[*websocket.Conn]bool),
 		broadcaster: make(chan models.ChatMessage),
 		host:        os.Getenv("HOST_NAME"),

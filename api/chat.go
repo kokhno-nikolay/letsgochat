@@ -75,7 +75,7 @@ func (h *Handler) handleMessages(token string) {
 	for {
 		msg := <-h.broadcaster
 
-		user, err := h.userRepo.FindById(h.sessions[token])
+		user, err := h.userRepo.FindById(h.Sessions[token])
 		if err != nil {
 			log.Fatal(err.Error())
 		}

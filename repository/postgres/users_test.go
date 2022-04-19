@@ -25,6 +25,22 @@ func TestNewUsersRepo(t *testing.T) {
 	require.IsType(t, userRepo, repos.Users)
 }
 
+func TestUsersRepo_TestFindById(t *testing.T) {
+	db, mock := NewMock()
+	repo := repository.NewRepositories(db)
+
+	query := "SELECT id, username, password, active  FROM users WHERE id = \\\\?"
+
+	rows := sqlmock.NewRows([]string{"id", "username", "password", "active"}).
+		AddRow(u.ID, u.Username, u.Password, u.Active)
+
+	mock.ExpectQuery(query).WithArgs(u.ID).WillReturnRows(rows)
+
+	user, err := repo.Users.FindById(u.ID)
+	assert.NotNil(t, user)
+	assert.NoError(t, err)
+}
+
 func TestUsersRepo_TestFindByUsername(t *testing.T) {
 	db, mock := NewMock()
 	repo := repository.NewRepositories(db)
