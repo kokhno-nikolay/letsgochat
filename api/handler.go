@@ -54,11 +54,6 @@ func (h *Handler) Init() *gin.Engine {
 		c.String(http.StatusOK, "pong")
 	})
 
-	router.LoadHTMLGlob("templates/*")
-	router.GET("/", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "index.html", nil)
-	})
-
 	/* User handlers */
 	router.POST("/user", h.SignUp)
 	router.POST("/user/login", h.SignIn)
@@ -77,6 +72,9 @@ func (h *Handler) Init() *gin.Engine {
 		}
 
 		defer func() {
+			if err := h.userRepo.SwitchToInactive(h.Sessions[token]); err != nil {
+				return
+			}
 			h.DeleteSession(token)
 			log.Println("token deleted successfully")
 		}()

@@ -69,6 +69,17 @@ func TestUsersRepo_TestCreate(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+func TestUsersRepo_UserExists(t *testing.T) {
+	db, mock := NewMock()
+	repo := repository.NewRepositories(db)
+
+	query := "SELECT count(*) from users WHERE username = $1"
+	prep := mock.ExpectPrepare(query)
+	prep.ExpectExec().WithArgs(u.Username)
+
+	repo.Users.UserExists(u.Username)
+}
+
 func TestUsersRepo_GetAllActive(t *testing.T) {
 	db, mock := NewMock()
 	repo := repository.NewRepositories(db)

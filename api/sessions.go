@@ -13,19 +13,13 @@ func (h *Handler) CheckUserSession(userId int) (bool, string) {
 	return false, ""
 }
 
-func (h *Handler) DeleteSession(token string) error {
+func (h *Handler) DeleteSession(token string) {
 	_, ok := h.Sessions[token]
 	if ok {
 		h.mu.Lock()
 		defer h.mu.Unlock()
-
-		if err := h.userRepo.SwitchToInactive(h.Sessions[token]); err != nil {
-			return err
-		}
 		delete(h.Sessions, token)
 	}
-
-	return nil
 }
 
 func (h *Handler) CheckUserToken(token string) bool {
