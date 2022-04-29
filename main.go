@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
-	"log"
 	"net/http"
 	"os"
+
+	"github.com/gin-gonic/gin"
 
 	"github.com/kokhno-nikolay/letsgochat/api"
 	"github.com/kokhno-nikolay/letsgochat/repository"
@@ -14,7 +14,7 @@ import (
 func main() {
 	db, err := postgres.NewClient(os.Getenv("POSTGRES_URL"))
 	if err != nil {
-		log.Println(err.Error())
+		panic(err.Error())
 	}
 
 	repos := repository.NewRepositories(db)
