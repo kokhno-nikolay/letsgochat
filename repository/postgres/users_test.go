@@ -2,13 +2,13 @@ package postgres_test
 
 import (
 	"database/sql"
+	"github.com/kokhno-nikolay/letsgochat/models"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/kokhno-nikolay/letsgochat/models"
 	"github.com/kokhno-nikolay/letsgochat/repository"
 )
 
@@ -120,4 +120,22 @@ func TestUsersRepo_SwitchToInactive(t *testing.T) {
 
 	err := repo.Users.SwitchToInactive(u.ID)
 	assert.Error(t, err)
+}
+
+func TestUsersRepo_Drop(t *testing.T) {
+	db, _ := NewMock()
+	repo := repository.NewRepositories(db)
+	repo.Users.Drop()
+}
+
+func TestUsersRepo_Up(t *testing.T) {
+	db, _ := NewMock()
+	repo := repository.NewRepositories(db)
+	repo.Users.Up()
+}
+
+func TestUsersRepo_Close(t *testing.T) {
+	db, _ := NewMock()
+	repo := repository.NewRepositories(db)
+	repo.Users.Close()
 }

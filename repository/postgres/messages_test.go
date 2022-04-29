@@ -1,12 +1,12 @@
 package postgres_test
 
 import (
+	"github.com/kokhno-nikolay/letsgochat/models"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/kokhno-nikolay/letsgochat/models"
 	"github.com/kokhno-nikolay/letsgochat/repository"
 )
 

@@ -5,6 +5,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/kokhno-nikolay/letsgochat/middlewares"
@@ -20,4 +22,14 @@ func TestLogging(t *testing.T) {
 	mw.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Result().StatusCode)
+}
+
+func TestLogger(t *testing.T) {
+	router := gin.Default()
+	log := logrus.New()
+	router.Use(middlewares.Logger(log), gin.Recovery())
+
+	resp := httptest.NewRecorder()
+	router.ServeHTTP(resp, httptest.NewRequest(http.MethodGet, "/", nil))
+	assert.Equal(t, resp.Code, http.StatusNotFound)
 }

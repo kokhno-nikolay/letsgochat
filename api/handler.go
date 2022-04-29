@@ -1,6 +1,7 @@
 package api
 
 import (
+	"github.com/kokhno-nikolay/letsgochat/models"
 	"net/http"
 	"os"
 	"sync"
@@ -10,7 +11,6 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/kokhno-nikolay/letsgochat/middlewares"
-	"github.com/kokhno-nikolay/letsgochat/models"
 	"github.com/kokhno-nikolay/letsgochat/repository"
 )
 

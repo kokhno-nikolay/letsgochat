@@ -1,13 +1,12 @@
 package api
 
 import (
+	"github.com/kokhno-nikolay/letsgochat/models"
 	"io"
 	"log"
 	"net/http"
 
 	"github.com/gorilla/websocket"
-
-	"github.com/kokhno-nikolay/letsgochat/models"
 )
 
 func (h *Handler) handleConnections(w http.ResponseWriter, r *http.Request) {

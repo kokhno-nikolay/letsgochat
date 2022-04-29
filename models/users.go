@@ -6,8 +6,3 @@ type User struct {
 	Password string `json:"password"`
 	Active   bool   `json:"active"`
 }
-
-type UserInput struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-}

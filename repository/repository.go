@@ -2,12 +2,15 @@ package repository
 
 import (
 	"database/sql"
-
 	"github.com/kokhno-nikolay/letsgochat/models"
+
 	"github.com/kokhno-nikolay/letsgochat/repository/postgres"
 )
 
 type Users interface {
+	Drop() error
+	Up() error
+	Close()
 	FindById(id int) (models.User, error)
 	FindByUsername(username string) (models.User, error)
 	Create(user models.User) error

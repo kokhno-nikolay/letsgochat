@@ -2,16 +2,20 @@ package api
 
 import (
 	"fmt"
+	"github.com/kokhno-nikolay/letsgochat/models"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-
-	"github.com/kokhno-nikolay/letsgochat/models"
 )
 
+type userInput struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
 func (h *Handler) SignUp(c *gin.Context) {
-	var inp models.UserInput
+	var inp userInput
 
 	if err := c.BindJSON(&inp); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -76,7 +80,7 @@ func (h *Handler) SignUp(c *gin.Context) {
 }
 
 func (h *Handler) SignIn(c *gin.Context) {
-	var inp models.UserInput
+	var inp userInput
 
 	if err := c.BindJSON(&inp); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -156,7 +160,8 @@ func (h *Handler) SignIn(c *gin.Context) {
 
 	if err := h.userRepo.SwitchToActive(user.ID); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
+			"code":    http.StatusInternalServerError,
+			"message": err.Error(),
 		})
 
 		return
