@@ -1,81 +1,90 @@
 package api
 
 import (
+	"github.com/kokhno-nikolay/letsgochat/models"
+	"io"
 	"log"
 	"net/http"
 
 	"github.com/gorilla/websocket"
 )
 
-var wsUpgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-}
-
-func (h *Handler) Chat(w http.ResponseWriter, r *http.Request, token string) {
-	wsUpgrader.CheckOrigin = func(r *http.Request) bool {
-		return true
+func (h *Handler) handleConnections(w http.ResponseWriter, r *http.Request) {
+	var upgrader = websocket.Upgrader{
+		CheckOrigin: func(r *http.Request) bool {
+			return true
+		},
 	}
 
-	ws, err := wsUpgrader.Upgrade(w, r, nil)
+	ws, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Println("Failed to set websocket upgrade: ", err.Error())
-		return
+		log.Fatal(err)
 	}
-	defer func() {
-		ws.Close()
-	}()
+	defer ws.Close()
+	h.clients[ws] = true
 
-	reader(ws)
-}
+	messages, err := h.messageRepo.GetAll()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 
-func reader(conn *websocket.Conn) {
+	if len(messages) != 0 {
+		for _, msg := range messages {
+			h.messageClient(ws, msg)
+		}
+	}
+
 	for {
-		messageType, p, err := conn.ReadMessage()
+		var msg models.ChatMessage
+		err := ws.ReadJSON(&msg)
 		if err != nil {
-			return
+			delete(h.clients, ws)
+			break
 		}
-		log.Println("New message: ", string(p))
 
-		if err := conn.WriteMessage(messageType, p); err != nil {
-			log.Println(err.Error())
-			return
+		if len(msg.Text) < 1 {
+			log.Println("incorrect message text")
+			continue
 		}
+
+		h.broadcaster <- msg
 	}
 }
 
-func (h *Handler) checkToken(token string) bool {
-	h.mu.Lock()
-	defer h.mu.Unlock()
-
-	_, ok := h.sessions[token]
-	return ok
+func (h *Handler) messageClient(client *websocket.Conn, msg models.ChatMessage) {
+	err := client.WriteJSON(msg)
+	if err != nil && h.unsafeError(err) {
+		log.Printf("error: %v", err)
+		client.Close()
+		delete(h.clients, client)
+	}
 }
 
-func (h *Handler) deleteToken(token string) error {
-	if err := h.userRepo.SwitchToInactive(h.sessions[token]); err != nil {
-		return err
+func (h *Handler) messageClients(msg models.ChatMessage) {
+	for client := range h.clients {
+		h.messageClient(client, msg)
 	}
-
-	_, ok := h.sessions[token]
-	if ok {
-		h.mu.Lock()
-		delete(h.sessions, token)
-		h.mu.Unlock()
-	}
-
-	return nil
 }
 
-func (h *Handler) checkUserSession(userId int) (bool, string) {
-	h.mu.Lock()
-	defer h.mu.Unlock()
+func (h *Handler) unsafeError(err error) bool {
+	return !websocket.IsCloseError(err, websocket.CloseGoingAway) && err != io.EOF
+}
 
-	for key, value := range h.sessions {
-		if value == userId {
-			return true, key
+func (h *Handler) handleMessages(token string) {
+	for {
+		msg := <-h.broadcaster
+
+		user, err := h.userRepo.FindById(h.Sessions[token])
+		if err != nil {
+			log.Fatal(err.Error())
 		}
-	}
 
-	return false, ""
+		msgModel := models.Message{Text: msg.Text, UserId: user.ID}
+		if err := h.messageRepo.Create(msgModel); err != nil {
+			log.Fatal(err.Error())
+		}
+
+		msg.Username = user.Username
+		h.messageClients(msg)
+	}
 }

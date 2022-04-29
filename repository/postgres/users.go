@@ -4,12 +4,11 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"github.com/kokhno-nikolay/letsgochat/models"
 	"time"
 
 	"github.com/jackc/pgerrcode"
 	"github.com/lib/pq"
-
-	"github.com/kokhno-nikolay/letsgochat/models"
 )
 
 type UsersRepo struct {
@@ -20,6 +19,61 @@ func NewUsersRepo(db *sql.DB) *UsersRepo {
 	return &UsersRepo{
 		db: db,
 	}
+}
+
+func (r *UsersRepo) Drop() error {
+	ctx := context.Background()
+
+	query := "DROP TABLE IF EXISTS users"
+	stmt, err := r.db.PrepareContext(ctx, query)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.ExecContext(ctx)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *UsersRepo) Up() error {
+	ctx := context.Background()
+
+	query :=
+		"CREATE TABLE IF NOT EXISTS users (" +
+			"id SERIAL PRIMARY KEY," +
+			"username VARCHAR(255)," +
+			"password VARCHAR(255)," +
+			"active BOOLEAN" +
+			")"
+	stmt, err := r.db.PrepareContext(ctx, query)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.ExecContext(ctx)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *UsersRepo) Close() {
+	r.db.Close()
+}
+
+func (r *UsersRepo) FindById(id int) (models.User, error) {
+	user := models.User{}
+
+	row := r.db.QueryRow("SELECT id, username, password, active  FROM users WHERE id = $1", id)
+	err := row.Scan(&user.ID, &user.Username, &user.Password, &user.Active)
+
+	return user, err
 }
 
 func (r *UsersRepo) FindByUsername(username string) (models.User, error) {

@@ -2,8 +2,9 @@ package repository_test
 
 import (
 	"database/sql"
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 
 	"github.com/kokhno-nikolay/letsgochat/repository"
 )

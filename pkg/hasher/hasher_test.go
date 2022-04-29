@@ -78,3 +78,24 @@ func TestCheckHashPassword(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkHashPassword(b *testing.B) {
+	pass := "5bf07105-6aac-4220-a5bc-c90590b38a20"
+	secret := "47H37P6dRfN66DLy5rCA3sP37xdzdXkh"
+	h := hasher.NewHasher(secret)
+
+	for n := 0; n < b.N; n++ {
+		h.HashPassword(pass)
+	}
+}
+
+func BenchmarkCheckHashPassword(b *testing.B) {
+	pass := "5bf07105-6aac-4220-a5bc-c90590b38a20"
+	secret := "47H37P6dRfN66DLy5rCA3sP37xdzdXkh"
+	hash := "5853fe150561d796d8e10e301db899af0000000000000000000000000000000000000000"
+	h := hasher.NewHasher(secret)
+
+	for n := 0; n < b.N; n++ {
+		h.CheckHashPassword(pass, hash)
+	}
+}

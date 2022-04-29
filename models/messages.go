@@ -5,3 +5,8 @@ type Message struct {
 	Text   string `json:"text"`
 	UserId int    `json:"user_id"`
 }
+
+type ChatMessage struct {
+	Text     string `json:"text"`
+	Username string `json:"username"`
+}

@@ -1,7 +1,9 @@
 package main
 
 import (
+	"github.com/gin-gonic/gin"
 	"log"
+	"net/http"
 	"os"
 
 	"github.com/kokhno-nikolay/letsgochat/api"
@@ -18,6 +20,11 @@ func main() {
 	repos := repository.NewRepositories(db)
 	handler := api.NewHandler(api.Deps{Repos: repos})
 	router := handler.Init()
+
+	router.LoadHTMLGlob("templates/*")
+	router.GET("/", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "index.html", nil)
+	})
 
 	router.Run(":" + os.Getenv("PORT"))
 }

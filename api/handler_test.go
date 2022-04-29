@@ -2,10 +2,11 @@ package api_test
 
 import (
 	"database/sql"
-	"net/http"
 	"net/http/httptest"
 	"testing"
 
+	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/kokhno-nikolay/letsgochat/api"
@@ -19,17 +20,17 @@ func TestNewHandler(t *testing.T) {
 }
 
 func TestHandler_Init(t *testing.T) {
-	repos := repository.NewRepositories(&sql.DB{})
-	h := api.NewHandler(api.Deps{repos})
-
-	router := h.Init()
-	ts := httptest.NewServer(router)
-	defer ts.Close()
-
-	res, err := http.Get(ts.URL + "/ping")
+	db, _, err := sqlmock.New()
 	if err != nil {
-		t.Error(err)
+		assert.Nil(t, err)
 	}
+	repo := repository.NewRepositories(db)
+	handler := api.NewHandler(api.Deps{Repos: repo})
 
-	require.Equal(t, http.StatusOK, res.StatusCode)
+	req := httptest.NewRequest("GET", "/ping", nil)
+
+	w := httptest.NewRecorder()
+	handler.Init().ServeHTTP(w, req)
+
+	assert.Equal(t, 200, w.Code)
 }

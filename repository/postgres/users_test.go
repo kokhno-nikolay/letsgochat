@@ -2,13 +2,13 @@ package postgres_test
 
 import (
 	"database/sql"
+	"github.com/kokhno-nikolay/letsgochat/models"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/kokhno-nikolay/letsgochat/models"
 	"github.com/kokhno-nikolay/letsgochat/repository"
 )
 
@@ -23,6 +23,22 @@ func TestNewUsersRepo(t *testing.T) {
 	repos := repository.NewRepositories(&sql.DB{})
 	userRepo := repos.Users
 	require.IsType(t, userRepo, repos.Users)
+}
+
+func TestUsersRepo_TestFindById(t *testing.T) {
+	db, mock := NewMock()
+	repo := repository.NewRepositories(db)
+
+	query := "SELECT id, username, password, active  FROM users WHERE id = \\\\?"
+
+	rows := sqlmock.NewRows([]string{"id", "username", "password", "active"}).
+		AddRow(u.ID, u.Username, u.Password, u.Active)
+
+	mock.ExpectQuery(query).WithArgs(u.ID).WillReturnRows(rows)
+
+	user, err := repo.Users.FindById(u.ID)
+	assert.NotNil(t, user)
+	assert.NoError(t, err)
 }
 
 func TestUsersRepo_TestFindByUsername(t *testing.T) {
@@ -51,6 +67,17 @@ func TestUsersRepo_TestCreate(t *testing.T) {
 
 	err := repo.Users.Create(u)
 	assert.NoError(t, err)
+}
+
+func TestUsersRepo_UserExists(t *testing.T) {
+	db, mock := NewMock()
+	repo := repository.NewRepositories(db)
+
+	query := "SELECT count(*) from users WHERE username = $1"
+	prep := mock.ExpectPrepare(query)
+	prep.ExpectExec().WithArgs(u.Username)
+
+	repo.Users.UserExists(u.Username)
 }
 
 func TestUsersRepo_GetAllActive(t *testing.T) {
@@ -93,4 +120,22 @@ func TestUsersRepo_SwitchToInactive(t *testing.T) {
 
 	err := repo.Users.SwitchToInactive(u.ID)
 	assert.Error(t, err)
+}
+
+func TestUsersRepo_Drop(t *testing.T) {
+	db, _ := NewMock()
+	repo := repository.NewRepositories(db)
+	repo.Users.Drop()
+}
+
+func TestUsersRepo_Up(t *testing.T) {
+	db, _ := NewMock()
+	repo := repository.NewRepositories(db)
+	repo.Users.Up()
+}
+
+func TestUsersRepo_Close(t *testing.T) {
+	db, _ := NewMock()
+	repo := repository.NewRepositories(db)
+	repo.Users.Close()
 }

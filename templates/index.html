@@ -5,21 +5,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Chat example</title>
-    <script src="index.js" defer></script>
 </head>
 <body>
-<div class="header">
-    <h2>Chat example page</h2>
-</div>
-
+<h2>Chat example page</h2>
 <div class="chat-form">
     <label for="chat_inp">Enter message: </label>
     <input type="text" id="chat_inp" name="chat-inp">
-    <button id="form-submit">Send</button>
+    <button id="form-submit" onclick="sendMessage()">Send</button>
 </div>
+<div id="messages"></div>
 
-<div class="server-response">
-    <p>Received: <span id="res">please enter your message.</span></p>
-</div>
+<script defer>
+    let wssLink = prompt('please enter you wss link: ');
+    let socket = new WebSocket(wssLink);
+    let chat_inp = document.getElementById("chat_inp")
+
+    const sendMessage = () => {
+        if (chat_inp.value.length > 1) {
+            socket.send(JSON.stringify({text: chat_inp.value}));
+            chat_inp.value = ""
+        } else {
+            alert("please enter your message")
+        }
+    }
+
+    chat_inp.addEventListener("keyup", function (event) {
+        if (event.keyCode === 13) {
+            event.preventDefault();
+            sendMessage()
+        }
+    })
+
+    socket.onopen = () => {
+        console.log("Successfully connected from ws server");
+    };
+
+    socket.onclose = event => {
+        console.log("Socket closed connection: ", event);
+        socket.send("Client closed connection!")
+    };
+
+    socket.onerror = error => {
+        console.log("Socket error: ", error);
+        document.write('<html><body>invalid token</body></html>')
+    };
+
+    socket.onmessage = function(event) {
+        let data = JSON.parse(event.data);
+        let out = document.getElementById('messages');
+        let chatContent = `<p><strong>${data.username}</strong>: ${data.text}</p>`;
+        out.innerHTML += chatContent
+    }
+</script>
 </body>
 </html>
