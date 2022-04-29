@@ -2,7 +2,6 @@ package api_test
 
 import (
 	"fmt"
-	"github.com/kokhno-nikolay/letsgochat/models"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -15,6 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/kokhno-nikolay/letsgochat/api"
+	"github.com/kokhno-nikolay/letsgochat/models"
 	"github.com/kokhno-nikolay/letsgochat/repository"
 	"github.com/kokhno-nikolay/letsgochat/repository/postgres"
 )
