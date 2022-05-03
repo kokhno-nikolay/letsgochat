@@ -14,6 +14,16 @@ type userInput struct {
 	Password string `json:"password"`
 }
 
+// @Summary Sign up
+// @Tags users
+// @Description New user registration
+// @Accept  json
+// @Produce  json
+// @Param input body userInput true "user data"
+// @Success 200 {integer} integer 1
+// @Failure 400 {string} string "invalid input request"
+// @Failure 500 {string} string "something went wrong"
+// @Router /user [post]
 func (h *Handler) SignUp(c *gin.Context) {
 	var inp userInput
 
@@ -79,6 +89,16 @@ func (h *Handler) SignUp(c *gin.Context) {
 	})
 }
 
+// @Summary Sign in
+// @Tags User handlers
+// @Description User account login
+// @Accept  json
+// @Produce  json
+// @Param input body userInput true "user data"
+// @Success 200 {integer} integer 1
+// @Failure 400 {string} string "invalid input request"
+// @Failure 500 {string} string "something went wrong"
+// @Router /user/login [post]
 func (h *Handler) SignIn(c *gin.Context) {
 	var inp userInput
 

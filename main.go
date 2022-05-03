@@ -11,6 +11,12 @@ import (
 	"github.com/kokhno-nikolay/letsgochat/repository/postgres"
 )
 
+// @title Lets go chat
+// @version 1.0
+// @description Online chat in golang
+
+// @host https://letsgochat.herokuapp.com
+// @BasePath /
 func main() {
 	db, err := postgres.NewClient(os.Getenv("POSTGRES_URL"))
 	if err != nil {
