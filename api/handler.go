@@ -1,7 +1,6 @@
 package api
 
 import (
-	"github.com/kokhno-nikolay/letsgochat/models"
 	"net/http"
 	"os"
 	"sync"
@@ -10,8 +9,14 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
 
+	"github.com/kokhno-nikolay/letsgochat/models"
+
 	"github.com/kokhno-nikolay/letsgochat/middlewares"
 	"github.com/kokhno-nikolay/letsgochat/repository"
+)
+
+var (
+	workerPool = 100
 )
 
 type Handler struct {
@@ -34,7 +39,7 @@ func NewHandler(deps Deps) *Handler {
 		messageRepo: deps.Repos.Messages,
 		Sessions:    make(map[string]int),
 		clients:     make(map[*websocket.Conn]bool),
-		broadcaster: make(chan models.ChatMessage),
+		broadcaster: make(chan models.ChatMessage, workerPool),
 		host:        os.Getenv("HOST_NAME"),
 	}
 }

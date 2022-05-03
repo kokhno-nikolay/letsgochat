@@ -1,10 +1,11 @@
 package api
 
 import (
-	"github.com/kokhno-nikolay/letsgochat/models"
 	"io"
 	"log"
 	"net/http"
+
+	"github.com/kokhno-nikolay/letsgochat/models"
 
 	"github.com/gorilla/websocket"
 )
