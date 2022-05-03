@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"os"
 	"sync"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -16,14 +17,22 @@ import (
 )
 
 var (
-	workerPool = 100
+	workersNum = 100
 )
+
+type Job struct {
+	ID        int
+	Name      string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
 
 type Handler struct {
 	userRepo    repository.Users
 	messageRepo repository.Messages
 	Sessions    map[string]int
 	clients     map[*websocket.Conn]bool
+	messageCh   chan message
 	broadcaster chan models.ChatMessage
 	host        string
 	mu          sync.Mutex
@@ -39,7 +48,8 @@ func NewHandler(deps Deps) *Handler {
 		messageRepo: deps.Repos.Messages,
 		Sessions:    make(map[string]int),
 		clients:     make(map[*websocket.Conn]bool),
-		broadcaster: make(chan models.ChatMessage, workerPool),
+		messageCh:   make(chan message, workersNum),
+		broadcaster: make(chan models.ChatMessage),
 		host:        os.Getenv("HOST_NAME"),
 	}
 }
@@ -81,7 +91,6 @@ func (h *Handler) Init() *gin.Engine {
 				return
 			}
 			h.DeleteSession(token)
-			log.Println("token deleted successfully")
 		}()
 
 		go h.handleMessages(token)

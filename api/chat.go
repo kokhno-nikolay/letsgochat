@@ -10,6 +10,11 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+type message struct {
+	Client  *websocket.Conn
+	Message models.ChatMessage
+}
+
 func (h *Handler) handleConnections(w http.ResponseWriter, r *http.Request) {
 	var upgrader = websocket.Upgrader{
 		CheckOrigin: func(r *http.Request) bool {
@@ -61,9 +66,19 @@ func (h *Handler) messageClient(client *websocket.Conn, msg models.ChatMessage) 
 	}
 }
 
-func (h *Handler) messageClients(msg models.ChatMessage) {
+func (h *Handler) workerMessage(msg models.ChatMessage) {
+	h.messageCh = make(chan message, workersNum)
+
 	for client := range h.clients {
-		h.messageClient(client, msg)
+		msg := message{Client: client, Message: msg}
+		h.messageCh <- msg
+	}
+	close(h.messageCh)
+}
+
+func (h *Handler) messageClients() {
+	for msg := range h.messageCh {
+		go h.messageClient(msg.Client, msg.Message)
 	}
 }
 
@@ -86,6 +101,7 @@ func (h *Handler) handleMessages(token string) {
 		}
 
 		msg.Username = user.Username
-		h.messageClients(msg)
+		h.workerMessage(msg)
+		h.messageClients()
 	}
 }

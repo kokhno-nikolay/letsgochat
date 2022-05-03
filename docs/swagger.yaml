@@ -1,0 +1,77 @@
+basePath: /
+definitions:
+  api.userInput:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+host: https://letsgochat.herokuapp.com
+info:
+  contact: {}
+  description: Online chat in golang
+  title: Lets go chat
+  version: "1.0"
+paths:
+  /user:
+    post:
+      consumes:
+      - application/json
+      description: New user registration
+      parameters:
+      - description: user data
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/api.userInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: invalid input request
+          schema:
+            type: string
+        "500":
+          description: something went wrong
+          schema:
+            type: string
+      summary: Sign up
+      tags:
+      - users
+  /user/login:
+    post:
+      consumes:
+      - application/json
+      description: User account login
+      parameters:
+      - description: user data
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/api.userInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: invalid input request
+          schema:
+            type: string
+        "500":
+          description: something went wrong
+          schema:
+            type: string
+      summary: Sign in
+      tags:
+      - User handlers
+swagger: "2.0"
