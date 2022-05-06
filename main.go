@@ -1,10 +1,12 @@
 package main
 
 import (
+	"log"
 	"net/http"
 	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 
 	"github.com/kokhno-nikolay/letsgochat/api"
 	"github.com/kokhno-nikolay/letsgochat/repository"
@@ -33,4 +35,11 @@ func main() {
 	})
 
 	router.Run(":" + os.Getenv("PORT"))
+}
+
+func init() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Println("Error loading local .env file. Now used production(heroku) env file.")
+	}
 }
