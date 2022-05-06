@@ -11,14 +11,11 @@ First of all, [download](https://golang.org/dl/) and install **Go**. Version `1.
 ## ⚙ Config (.env)
 Create <b>.env</b> file and add the value as in example.
 
-| Name                   | Type | Example value |
-|------------------------| ------ |  ------ |
-| SECRET_KEY | string | secret |
-| POSTGRES_HOST_NAME     | string | postgres |
-| POSTGRES_PORT          | int | 5432 |
-| POSTGRES_USERNAME      | string | postgres |
-| POSTGRES_PASSWORD      | string | postgres |
-| POSTGRES_DATABASE_NAME | string | lets_go_chat |
+| Name                   | Type   | Example value                                      |
+|------------------------|--------|----------------------------------------------------|
+| HOST_NAME              | string | localhost                                          |
+| PORT                   | int    | 8080                                               |
+| POSTGRES_URL           | string | postgres://postgres:root@localhost:5432/letsgochat |
 
 ## 🧩 How to run
 1) Clone project
