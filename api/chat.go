@@ -78,7 +78,7 @@ func (h *Handler) workerMessage(msg models.ChatMessage) {
 
 func (h *Handler) messageClients() {
 	for msg := range h.messageCh {
-		go h.messageClient(msg.Client, msg.Message)
+		h.messageClient(msg.Client, msg.Message)
 	}
 }
 
@@ -102,6 +102,15 @@ func (h *Handler) handleMessages(token string) {
 
 		msg.Username = user.Username
 		h.workerMessage(msg)
-		h.messageClients()
+
+		if len(h.clients) < workersNum {
+			for i := 0; i <= len(h.clients); i++ {
+				go h.messageClients()
+			}
+		} else {
+			for i := 0; i <= workersNum; i++ {
+				go h.messageClients()
+			}
+		}
 	}
 }
