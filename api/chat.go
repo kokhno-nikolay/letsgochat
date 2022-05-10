@@ -15,6 +15,15 @@ type message struct {
 	Message models.ChatMessage
 }
 
+// @Summary Connecting to chat
+// @Tags Chat
+// @Description Endpoint to start real time chat
+// @Accept  json
+// @Produce  json
+// @Param string query string false "token"
+// @Success 200 {string} string "Successful server response"
+// @Failure 500 {string} string "Internal server error"
+// @Router /chat [get]
 func (h *Handler) handleConnections(w http.ResponseWriter, r *http.Request) {
 	var upgrader = websocket.Upgrader{
 		CheckOrigin: func(r *http.Request) bool {
