@@ -2,8 +2,9 @@ package api
 
 import (
 	"fmt"
-	"github.com/kokhno-nikolay/letsgochat/models"
 	"net/http"
+
+	"github.com/kokhno-nikolay/letsgochat/models"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -15,14 +16,14 @@ type userInput struct {
 }
 
 // @Summary Sign up
-// @Tags users
-// @Description New user registration
+// @Tags Users
+// @Description Registration a new user in the system
 // @Accept  json
 // @Produce  json
-// @Param input body userInput true "user data"
-// @Success 200 {integer} integer 1
-// @Failure 400 {string} string "invalid input request"
-// @Failure 500 {string} string "something went wrong"
+// @Param input body userInput true "Please enter your username and password to register"
+// @Success 200 {object} models.JSONResult{data=string} "Successful server response"
+// @Failure 400 {object} models.JSONResult{data=string} "Invalid input request"
+// @Failure 500 {object} models.JSONResult{data=string} "Internal server error"
 // @Router /user [post]
 func (h *Handler) SignUp(c *gin.Context) {
 	var inp userInput
@@ -90,14 +91,14 @@ func (h *Handler) SignUp(c *gin.Context) {
 }
 
 // @Summary Sign in
-// @Tags User handlers
+// @Tags Users
 // @Description User account login
 // @Accept  json
 // @Produce  json
-// @Param input body userInput true "user data"
-// @Success 200 {integer} integer 1
-// @Failure 400 {string} string "invalid input request"
-// @Failure 500 {string} string "something went wrong"
+// @Param input body userInput true "Please enter your username and password to login"
+// @Success 200 {object} models.JSONResult{data=string} "Successful server response"
+// @Failure 400 {object} models.JSONResult{data=string} "Invalid input request"
+// @Failure 500 {object} models.JSONResult{data=string} "Internal server error"
 // @Router /user/login [post]
 func (h *Handler) SignIn(c *gin.Context) {
 	var inp userInput
@@ -193,6 +194,14 @@ func (h *Handler) SignIn(c *gin.Context) {
 	})
 }
 
+// @Summary Active users
+// @Tags Users
+// @Description Number of active users in a chat
+// @Accept  json
+// @Produce  json
+// @Success 200 {string} []string "Returns all active users in the chat"
+// @Failure 500 {string} string "Internal server error"
+// @Router /user/active [get]
 func (h *Handler) GetActiveUsers(c *gin.Context) {
 	var res []string
 

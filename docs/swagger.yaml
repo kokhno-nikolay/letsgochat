@@ -7,6 +7,13 @@ definitions:
       username:
         type: string
     type: object
+  models.JSONResult:
+    properties:
+      data: {}
+      message:
+        example: description of the response from the server
+        type: string
+    type: object
 host: https://letsgochat.herokuapp.com
 info:
   contact: {}
@@ -18,9 +25,9 @@ paths:
     post:
       consumes:
       - application/json
-      description: New user registration
+      description: Registration a new user in the system
       parameters:
-      - description: user data
+      - description: Please enter your username and password to register
         in: body
         name: input
         required: true
@@ -30,27 +37,61 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Successful server response
           schema:
-            type: integer
+            allOf:
+            - $ref: '#/definitions/models.JSONResult'
+            - properties:
+                data:
+                  type: string
+              type: object
         "400":
-          description: invalid input request
+          description: Invalid input request
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.JSONResult'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Internal server error
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.JSONResult'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Sign up
+      tags:
+      - Users
+  /user/active:
+    get:
+      consumes:
+      - application/json
+      description: Number of active users in a chat
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Returns all active users in the chat
           schema:
             type: string
         "500":
-          description: something went wrong
+          description: Internal server error
           schema:
             type: string
-      summary: Sign up
+      summary: Active users
       tags:
-      - users
+      - Users
   /user/login:
     post:
       consumes:
       - application/json
       description: User account login
       parameters:
-      - description: user data
+      - description: Please enter your username and password to login
         in: body
         name: input
         required: true
@@ -60,18 +101,33 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Successful server response
           schema:
-            type: integer
+            allOf:
+            - $ref: '#/definitions/models.JSONResult'
+            - properties:
+                data:
+                  type: string
+              type: object
         "400":
-          description: invalid input request
+          description: Invalid input request
           schema:
-            type: string
+            allOf:
+            - $ref: '#/definitions/models.JSONResult'
+            - properties:
+                data:
+                  type: string
+              type: object
         "500":
-          description: something went wrong
+          description: Internal server error
           schema:
-            type: string
+            allOf:
+            - $ref: '#/definitions/models.JSONResult'
+            - properties:
+                data:
+                  type: string
+              type: object
       summary: Sign in
       tags:
-      - User handlers
+      - Users
 swagger: "2.0"

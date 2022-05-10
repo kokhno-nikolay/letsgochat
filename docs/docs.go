@@ -18,7 +18,7 @@ const docTemplate = `{
     "paths": {
         "/user": {
             "post": {
-                "description": "New user registration",
+                "description": "Registration a new user in the system",
                 "consumes": [
                     "application/json"
                 ],
@@ -26,12 +26,12 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "users"
+                    "Users"
                 ],
                 "summary": "Sign up",
                 "parameters": [
                     {
-                        "description": "user data",
+                        "description": "Please enter your username and password to register",
                         "name": "input",
                         "in": "body",
                         "required": true,
@@ -42,19 +42,84 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Successful server response",
                         "schema": {
-                            "type": "integer"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.JSONResult"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
-                        "description": "invalid input request",
+                        "description": "Invalid input request",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.JSONResult"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.JSONResult"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/user/active": {
+            "get": {
+                "description": "Number of active users in a chat",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Active users",
+                "responses": {
+                    "200": {
+                        "description": "Returns all active users in the chat",
                         "schema": {
                             "type": "string"
                         }
                     },
                     "500": {
-                        "description": "something went wrong",
+                        "description": "Internal server error",
                         "schema": {
                             "type": "string"
                         }
@@ -72,12 +137,12 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "User handlers"
+                    "Users"
                 ],
                 "summary": "Sign in",
                 "parameters": [
                     {
-                        "description": "user data",
+                        "description": "Please enter your username and password to login",
                         "name": "input",
                         "in": "body",
                         "required": true,
@@ -88,21 +153,57 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Successful server response",
                         "schema": {
-                            "type": "integer"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.JSONResult"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
-                        "description": "invalid input request",
+                        "description": "Invalid input request",
                         "schema": {
-                            "type": "string"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.JSONResult"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "500": {
-                        "description": "something went wrong",
+                        "description": "Internal server error",
                         "schema": {
-                            "type": "string"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.JSONResult"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
@@ -118,6 +219,16 @@ const docTemplate = `{
                 },
                 "username": {
                     "type": "string"
+                }
+            }
+        },
+        "models.JSONResult": {
+            "type": "object",
+            "properties": {
+                "data": {},
+                "message": {
+                    "type": "string",
+                    "example": "description of the response from the server"
                 }
             }
         }
