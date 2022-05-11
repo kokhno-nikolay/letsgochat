@@ -8,10 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 
-	"github.com/kokhno-nikolay/letsgochat/api"
-	"github.com/kokhno-nikolay/letsgochat/repository"
 	"github.com/kokhno-nikolay/letsgochat/repository/postgres"
-	"github.com/kokhno-nikolay/letsgochat/services"
 )
 
 // @title Lets go chat
@@ -26,9 +23,7 @@ func main() {
 		panic(err.Error())
 	}
 
-	repos := repository.NewRepositories(db)
-	servs := services.NewServices(services.Deps{Repos: repos})
-	handler := api.NewHandler(api.Deps{Repos: repos}, servs)
+	handler := Wire(db)
 	router := handler.Init()
 
 	router.LoadHTMLGlob("templates/*")
