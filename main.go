@@ -11,6 +11,7 @@ import (
 	"github.com/kokhno-nikolay/letsgochat/api"
 	"github.com/kokhno-nikolay/letsgochat/repository"
 	"github.com/kokhno-nikolay/letsgochat/repository/postgres"
+	"github.com/kokhno-nikolay/letsgochat/services"
 )
 
 // @title Lets go chat
@@ -26,7 +27,8 @@ func main() {
 	}
 
 	repos := repository.NewRepositories(db)
-	handler := api.NewHandler(api.Deps{Repos: repos})
+	servs := services.NewServices(services.Deps{Repos: repos})
+	handler := api.NewHandler(api.Deps{Repos: repos}, servs)
 	router := handler.Init()
 
 	router.LoadHTMLGlob("templates/*")

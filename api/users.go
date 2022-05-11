@@ -55,17 +55,17 @@ func (h *Handler) SignUp(c *gin.Context) {
 		return
 	}
 
-	userExists, err := h.userRepo.UserExists(inp.Username)
+	userExists, err := h.services.Users.UserExists(inp.Username)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code":    http.StatusInternalServerError,
-			"message": err.Error(),
+			"message": "something went wrong, please try again. Error: " + err.Error(),
 		})
 
 		return
 	}
 
-	if userExists >= 1 {
+	if userExists {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code":    http.StatusBadRequest,
 			"message": fmt.Sprintf("user with username %s already exists", inp.Username),
@@ -75,7 +75,7 @@ func (h *Handler) SignUp(c *gin.Context) {
 	}
 
 	user := models.User{Username: inp.Username, Password: inp.Password, Active: false}
-	if err := h.userRepo.Create(user); err != nil {
+	if err := h.services.Users.Create(user); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code":    http.StatusInternalServerError,
 			"message": "something went wrong, please try again. Error: " + err.Error(),
@@ -130,17 +130,17 @@ func (h *Handler) SignIn(c *gin.Context) {
 		return
 	}
 
-	userExists, err := h.userRepo.UserExists(inp.Username)
+	userExists, err := h.services.Users.UserExists(inp.Username)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code":    http.StatusInternalServerError,
-			"message": err.Error(),
+			"message": "something went wrong, please try again. Error: " + err.Error(),
 		})
 
 		return
 	}
 
-	if userExists <= 0 {
+	if !userExists {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code":    http.StatusBadRequest,
 			"message": "user does not exist",
@@ -149,11 +149,11 @@ func (h *Handler) SignIn(c *gin.Context) {
 		return
 	}
 
-	user, err := h.userRepo.FindByUsername(inp.Username)
+	user, err := h.services.Users.FindByUsername(inp.Username)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code":    http.StatusInternalServerError,
-			"message": err.Error(),
+			"message": "something went wrong, please try again. Error: " + err.Error(),
 		})
 
 		return
@@ -179,10 +179,10 @@ func (h *Handler) SignIn(c *gin.Context) {
 		token = t
 	}
 
-	if err := h.userRepo.SwitchToActive(user.ID); err != nil {
+	if err := h.services.Users.SwitchToActive(user.ID); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code":    http.StatusInternalServerError,
-			"message": err.Error(),
+			"message": "something went wrong, please try again. Error: " + err.Error(),
 		})
 
 		return
@@ -205,7 +205,7 @@ func (h *Handler) SignIn(c *gin.Context) {
 func (h *Handler) GetActiveUsers(c *gin.Context) {
 	var res []string
 
-	users, err := h.userRepo.GetAllActive()
+	users, err := h.services.Users.GetActiveUsers()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code":    http.StatusInternalServerError,

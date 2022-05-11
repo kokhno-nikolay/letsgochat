@@ -99,7 +99,7 @@ func (h *Handler) handleMessages(token string) {
 	for {
 		msg := <-h.broadcaster
 
-		user, err := h.userRepo.FindById(h.Sessions[token])
+		user, err := h.services.Users.FindById(h.Sessions[token])
 		if err != nil {
 			log.Fatal(err.Error())
 		}
