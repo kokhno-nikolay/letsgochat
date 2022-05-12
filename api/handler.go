@@ -10,10 +10,10 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
 
-	"github.com/kokhno-nikolay/letsgochat/models"
-
 	"github.com/kokhno-nikolay/letsgochat/middlewares"
+	"github.com/kokhno-nikolay/letsgochat/models"
 	"github.com/kokhno-nikolay/letsgochat/repository"
+	"github.com/kokhno-nikolay/letsgochat/services"
 )
 
 var (
@@ -28,8 +28,7 @@ type Job struct {
 }
 
 type Handler struct {
-	userRepo    repository.Users
-	messageRepo repository.Messages
+	services    *services.Services
 	Sessions    map[string]int
 	clients     map[*websocket.Conn]bool
 	messageCh   chan message
@@ -42,10 +41,9 @@ type Deps struct {
 	Repos *repository.Repositories
 }
 
-func NewHandler(deps Deps) *Handler {
+func NewHandler(services *services.Services) *Handler {
 	return &Handler{
-		userRepo:    deps.Repos.Users,
-		messageRepo: deps.Repos.Messages,
+		services:    services,
 		Sessions:    make(map[string]int),
 		clients:     make(map[*websocket.Conn]bool),
 		messageCh:   make(chan message, workersNum),
@@ -87,7 +85,7 @@ func (h *Handler) Init() *gin.Engine {
 		}
 
 		defer func() {
-			if err := h.userRepo.SwitchToInactive(h.Sessions[token]); err != nil {
+			if err := h.services.Users.SwitchToInactive(h.Sessions[token]); err != nil {
 				return
 			}
 			h.DeleteSession(token)

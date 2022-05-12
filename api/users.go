@@ -2,11 +2,12 @@ package api
 
 import (
 	"fmt"
-	"github.com/kokhno-nikolay/letsgochat/models"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+
+	"github.com/kokhno-nikolay/letsgochat/models"
 )
 
 type userInput struct {
@@ -15,14 +16,14 @@ type userInput struct {
 }
 
 // @Summary Sign up
-// @Tags users
-// @Description New user registration
+// @Tags Users
+// @Description Registration a new user in the system
 // @Accept  json
 // @Produce  json
-// @Param input body userInput true "user data"
-// @Success 200 {integer} integer 1
-// @Failure 400 {string} string "invalid input request"
-// @Failure 500 {string} string "something went wrong"
+// @Param input body userInput true "Please enter your username and password to register"
+// @Success 200 {object} models.JSONResult{data=string} "Successful server response"
+// @Failure 400 {object} models.JSONResult{data=string} "Invalid input request"
+// @Failure 500 {object} models.JSONResult{data=string} "Internal server error"
 // @Router /user [post]
 func (h *Handler) SignUp(c *gin.Context) {
 	var inp userInput
@@ -54,17 +55,17 @@ func (h *Handler) SignUp(c *gin.Context) {
 		return
 	}
 
-	userExists, err := h.userRepo.UserExists(inp.Username)
+	userExists, err := h.services.Users.UserExists(inp.Username)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code":    http.StatusInternalServerError,
-			"message": err.Error(),
+			"message": "something went wrong, please try again. Error: " + err.Error(),
 		})
 
 		return
 	}
 
-	if userExists >= 1 {
+	if userExists {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code":    http.StatusBadRequest,
 			"message": fmt.Sprintf("user with username %s already exists", inp.Username),
@@ -74,7 +75,7 @@ func (h *Handler) SignUp(c *gin.Context) {
 	}
 
 	user := models.User{Username: inp.Username, Password: inp.Password, Active: false}
-	if err := h.userRepo.Create(user); err != nil {
+	if err := h.services.Users.Create(user); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code":    http.StatusInternalServerError,
 			"message": "something went wrong, please try again. Error: " + err.Error(),
@@ -90,14 +91,14 @@ func (h *Handler) SignUp(c *gin.Context) {
 }
 
 // @Summary Sign in
-// @Tags User handlers
+// @Tags Users
 // @Description User account login
 // @Accept  json
 // @Produce  json
-// @Param input body userInput true "user data"
-// @Success 200 {integer} integer 1
-// @Failure 400 {string} string "invalid input request"
-// @Failure 500 {string} string "something went wrong"
+// @Param input body userInput true "Please enter your username and password to login"
+// @Success 200 {object} models.JSONResult{data=string} "Successful server response"
+// @Failure 400 {object} models.JSONResult{data=string} "Invalid input request"
+// @Failure 500 {object} models.JSONResult{data=string} "Internal server error"
 // @Router /user/login [post]
 func (h *Handler) SignIn(c *gin.Context) {
 	var inp userInput
@@ -129,17 +130,17 @@ func (h *Handler) SignIn(c *gin.Context) {
 		return
 	}
 
-	userExists, err := h.userRepo.UserExists(inp.Username)
+	userExists, err := h.services.Users.UserExists(inp.Username)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code":    http.StatusInternalServerError,
-			"message": err.Error(),
+			"message": "something went wrong, please try again. Error: " + err.Error(),
 		})
 
 		return
 	}
 
-	if userExists <= 0 {
+	if !userExists {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code":    http.StatusBadRequest,
 			"message": "user does not exist",
@@ -148,11 +149,11 @@ func (h *Handler) SignIn(c *gin.Context) {
 		return
 	}
 
-	user, err := h.userRepo.FindByUsername(inp.Username)
+	user, err := h.services.Users.FindByUsername(inp.Username)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code":    http.StatusInternalServerError,
-			"message": err.Error(),
+			"message": "something went wrong, please try again. Error: " + err.Error(),
 		})
 
 		return
@@ -178,10 +179,10 @@ func (h *Handler) SignIn(c *gin.Context) {
 		token = t
 	}
 
-	if err := h.userRepo.SwitchToActive(user.ID); err != nil {
+	if err := h.services.Users.SwitchToActive(user.ID); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code":    http.StatusInternalServerError,
-			"message": err.Error(),
+			"message": "something went wrong, please try again. Error: " + err.Error(),
 		})
 
 		return
@@ -193,10 +194,18 @@ func (h *Handler) SignIn(c *gin.Context) {
 	})
 }
 
+// @Summary Active users
+// @Tags Users
+// @Description Number of active users in a chat
+// @Accept  json
+// @Produce  json
+// @Success 200 {string} []string "Returns all active users in the chat"
+// @Failure 500 {string} string "Internal server error"
+// @Router /user/active [get]
 func (h *Handler) GetActiveUsers(c *gin.Context) {
 	var res []string
 
-	users, err := h.userRepo.GetAllActive()
+	users, err := h.services.Users.GetActiveUsers()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code":    http.StatusInternalServerError,

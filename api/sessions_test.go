@@ -3,6 +3,7 @@ package api_test
 import (
 	"database/sql"
 	"fmt"
+	"github.com/kokhno-nikolay/letsgochat/services"
 	"testing"
 
 	"github.com/kokhno-nikolay/letsgochat/api"
@@ -11,7 +12,8 @@ import (
 
 func TestHandler_CheckUserSession(t *testing.T) {
 	repos := repository.NewRepositories(&sql.DB{})
-	handler := api.NewHandler(api.Deps{repos})
+	services := services.NewServices(services.Deps{Repos: repos})
+	handler := api.NewHandler(services)
 
 	for i, tt := range []struct {
 		token  string
@@ -49,7 +51,8 @@ func TestHandler_CheckUserSession(t *testing.T) {
 
 func TestHandler_DeleteSession(t *testing.T) {
 	repos := repository.NewRepositories(&sql.DB{})
-	handler := api.NewHandler(api.Deps{repos})
+	services := services.NewServices(services.Deps{Repos: repos})
+	handler := api.NewHandler(services)
 
 	for i, tt := range []struct {
 		token  string
@@ -82,7 +85,8 @@ func TestHandler_DeleteSession(t *testing.T) {
 
 func TestHandler_CheckUserToken(t *testing.T) {
 	repos := repository.NewRepositories(&sql.DB{})
-	handler := api.NewHandler(api.Deps{repos})
+	services := services.NewServices(services.Deps{Repos: repos})
+	handler := api.NewHandler(services)
 
 	for i, tt := range []struct {
 		token  string

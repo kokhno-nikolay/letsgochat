@@ -8,8 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 
-	"github.com/kokhno-nikolay/letsgochat/api"
-	"github.com/kokhno-nikolay/letsgochat/repository"
 	"github.com/kokhno-nikolay/letsgochat/repository/postgres"
 )
 
@@ -17,7 +15,7 @@ import (
 // @version 1.0
 // @description Online chat in golang
 
-// @host https://letsgochat.herokuapp.com
+// @host letsgochat.herokuapp.com
 // @BasePath /
 func main() {
 	db, err := postgres.NewClient(os.Getenv("POSTGRES_URL"))
@@ -25,8 +23,7 @@ func main() {
 		panic(err.Error())
 	}
 
-	repos := repository.NewRepositories(db)
-	handler := api.NewHandler(api.Deps{Repos: repos})
+	handler := Wire(db)
 	router := handler.Init()
 
 	router.LoadHTMLGlob("templates/*")

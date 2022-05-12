@@ -11,11 +11,13 @@ import (
 
 	"github.com/kokhno-nikolay/letsgochat/api"
 	"github.com/kokhno-nikolay/letsgochat/repository"
+	"github.com/kokhno-nikolay/letsgochat/services"
 )
 
 func TestNewHandler(t *testing.T) {
 	repos := repository.NewRepositories(&sql.DB{})
-	h := api.NewHandler(api.Deps{repos})
+	services := services.NewServices(services.Deps{Repos: repos})
+	h := api.NewHandler(services)
 	require.IsType(t, &api.Handler{}, h)
 }
 
@@ -25,7 +27,8 @@ func TestHandler_Init(t *testing.T) {
 		assert.Nil(t, err)
 	}
 	repo := repository.NewRepositories(db)
-	handler := api.NewHandler(api.Deps{Repos: repo})
+	services := services.NewServices(services.Deps{Repos: repo})
+	handler := api.NewHandler(services)
 
 	req := httptest.NewRequest("GET", "/ping", nil)
 
