@@ -29,7 +29,6 @@ type Job struct {
 
 type Handler struct {
 	services    *services.Services
-	messageRepo repository.Messages
 	Sessions    map[string]int
 	clients     map[*websocket.Conn]bool
 	messageCh   chan message
@@ -42,10 +41,9 @@ type Deps struct {
 	Repos *repository.Repositories
 }
 
-func NewHandler(deps Deps, services *services.Services) *Handler {
+func NewHandler(services *services.Services) *Handler {
 	return &Handler{
 		services:    services,
-		messageRepo: deps.Repos.Messages,
 		Sessions:    make(map[string]int),
 		clients:     make(map[*websocket.Conn]bool),
 		messageCh:   make(chan message, workersNum),

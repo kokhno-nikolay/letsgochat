@@ -15,8 +15,14 @@ type Users interface {
 	SwitchToInactive(userID int) error
 }
 
+type Messages interface {
+	GetAll() ([]models.ChatMessage, error)
+	Create(message models.Message) error
+}
+
 type Services struct {
-	Users Users
+	Users    Users
+	Messages Messages
 }
 
 type Deps struct {
@@ -25,8 +31,10 @@ type Deps struct {
 
 func NewServices(deps Deps) *Services {
 	usersService := NewUsersService(deps.Repos.Users)
+	messagesService := NewMessagesService(deps.Repos.Messages)
 
 	return &Services{
-		Users: usersService,
+		Users:    usersService,
+		Messages: messagesService,
 	}
 }

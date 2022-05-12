@@ -38,7 +38,7 @@ func (h *Handler) handleConnections(w http.ResponseWriter, r *http.Request) {
 	defer ws.Close()
 	h.clients[ws] = true
 
-	messages, err := h.messageRepo.GetAll()
+	messages, err := h.services.Messages.GetAll()
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -105,7 +105,7 @@ func (h *Handler) handleMessages(token string) {
 		}
 
 		msgModel := models.Message{Text: msg.Text, UserId: user.ID}
-		if err := h.messageRepo.Create(msgModel); err != nil {
+		if err := h.services.Messages.Create(msgModel); err != nil {
 			log.Fatal(err.Error())
 		}
 

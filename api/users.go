@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/kokhno-nikolay/letsgochat/models"
-
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+
+	"github.com/kokhno-nikolay/letsgochat/models"
 )
 
 type userInput struct {

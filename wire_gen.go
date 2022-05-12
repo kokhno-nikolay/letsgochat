@@ -19,7 +19,7 @@ import (
 func Wire(db *sql.DB) *api.Handler {
 	repositories := repository.NewRepositories(db)
 	services := services.NewServices(services.Deps{Repos: repositories})
-	handlers := api.NewHandler(api.Deps{Repos: repositories}, services)
+	handlers := api.NewHandler(services)
 	return handlers
 }
 
