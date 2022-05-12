@@ -14,7 +14,7 @@ definitions:
         example: description of the response from the server
         type: string
     type: object
-host: https://letsgochat.herokuapp.com
+host: letsgochat.herokuapp.com
 info:
   contact: {}
   description: Online chat in golang
