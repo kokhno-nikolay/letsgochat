@@ -45,9 +45,9 @@ func (u *UsersService) UserExists(username string) (bool, error) {
 }
 
 func (u *UsersService) SwitchToActive(userID int) error {
-	return u.SwitchToActive(userID)
+	return u.repo.SwitchToActive(userID)
 }
 
 func (u *UsersService) SwitchToInactive(userID int) error {
-	return u.SwitchToActive(userID)
+	return u.repo.SwitchToActive(userID)
 }
