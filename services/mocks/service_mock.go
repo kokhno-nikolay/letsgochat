@@ -135,3 +135,55 @@ func (mr *MockUsersMockRecorder) UserExists(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UserExists", reflect.TypeOf((*MockUsers)(nil).UserExists), arg0)
 }
+
+// MockMessages is a mock of Messages interface.
+type MockMessages struct {
+	ctrl     *gomock.Controller
+	recorder *MockMessagesMockRecorder
+}
+
+// MockMessagesMockRecorder is the mock recorder for MockMessages.
+type MockMessagesMockRecorder struct {
+	mock *MockMessages
+}
+
+// NewMockMessages creates a new mock instance.
+func NewMockMessages(ctrl *gomock.Controller) *MockMessages {
+	mock := &MockMessages{ctrl: ctrl}
+	mock.recorder = &MockMessagesMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockMessages) EXPECT() *MockMessagesMockRecorder {
+	return m.recorder
+}
+
+// Create mocks base method.
+func (m *MockMessages) Create(message models.Message) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Create", message)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Create indicates an expected call of Create.
+func (mr *MockMessagesMockRecorder) Create(message interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockMessages)(nil).Create), message)
+}
+
+// GetAll mocks base method.
+func (m *MockMessages) GetAll() ([]models.ChatMessage, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAll")
+	ret0, _ := ret[0].([]models.ChatMessage)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAll indicates an expected call of GetAll.
+func (mr *MockMessagesMockRecorder) GetAll() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAll", reflect.TypeOf((*MockMessages)(nil).GetAll))
+}
