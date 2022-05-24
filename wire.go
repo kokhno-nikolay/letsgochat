@@ -4,11 +4,11 @@
 package main
 
 import (
-	"database/sql"
 	"github.com/google/wire"
 	"github.com/kokhno-nikolay/letsgochat/api"
 	"github.com/kokhno-nikolay/letsgochat/repository"
 	"github.com/kokhno-nikolay/letsgochat/services"
+	"gorm.io/gorm"
 )
 
 var (
@@ -19,6 +19,6 @@ var (
 	)
 )
 
-func Wire(db *sql.DB) *repository.Repositories {
+func Wire(db *gorm.DB) *repository.Repositories {
 	panic(wire.Build(ProviderSet))
 }

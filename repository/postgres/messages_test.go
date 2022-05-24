@@ -1,12 +1,14 @@
 package postgres_test
 
 import (
-	"github.com/kokhno-nikolay/letsgochat/models"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/kokhno-nikolay/letsgochat/models"
 	"github.com/kokhno-nikolay/letsgochat/repository"
 )
 
@@ -22,17 +24,22 @@ var msgInp = models.ChatMessage{
 }
 
 func TestMessagesRepo_GetAll(t *testing.T) {
-	db, mock := NewMock()
-	repo := repository.NewRepositories(db)
+	postgresDB, mock, err := sqlmock.New()
+	if err != nil {
+		panic(err)
+	}
+	gormDB, err := gorm.Open(postgres.New(postgres.Config{
+		Conn: postgresDB,
+	}), &gorm.Config{})
+	repo := repository.NewRepositories(gormDB)
 
-	query := "SELECT messages.text, users.username FROM messages JOIN users ON messages.user_id = users.id"
+	query := "SELECT * FROM messages"
 	rows := sqlmock.NewRows([]string{"text", "username"}).
 		AddRow(msgInp.Text, msgInp.Username)
 
 	mock.ExpectQuery(query).WillReturnRows(rows)
 
 	msgs, err := repo.Messages.GetAll()
-	assert.NotEmpty(t, msgs)
 	assert.NoError(t, err)
 	assert.Len(t, msgs, 1)
 }

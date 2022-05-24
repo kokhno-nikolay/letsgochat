@@ -1,8 +1,8 @@
 package api
 
 func (h *Handler) CheckUserSession(userId int) (bool, string) {
-	h.mu.Lock()
-	defer h.mu.Unlock()
+	h.mu.RLock()
+	defer h.mu.RUnlock()
 
 	for key, value := range h.Sessions {
 		if value == userId {
@@ -23,8 +23,8 @@ func (h *Handler) DeleteSession(token string) {
 }
 
 func (h *Handler) CheckUserToken(token string) bool {
-	h.mu.Lock()
-	defer h.mu.Unlock()
+	h.mu.RLock()
+	defer h.mu.RUnlock()
 
 	_, ok := h.Sessions[token]
 	return ok

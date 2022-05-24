@@ -1,19 +1,15 @@
 package postgres
 
 import (
-	"database/sql"
 	"log"
 
 	_ "github.com/lib/pq"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
-func NewClient(uri string) (*sql.DB, error) {
-	db, err := sql.Open("postgres", uri)
-	if err != nil {
-		return nil, err
-	}
-
-	err = db.Ping()
+func NewClient(uri string) (*gorm.DB, error) {
+	db, err := gorm.Open(postgres.Open(uri), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}
