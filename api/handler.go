@@ -6,6 +6,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
@@ -34,7 +35,7 @@ type Handler struct {
 	messageCh   chan message
 	broadcaster chan models.ChatMessage
 	host        string
-	mu          sync.Mutex
+	mu          sync.RWMutex
 }
 
 type Deps struct {
@@ -94,6 +95,8 @@ func (h *Handler) Init() *gin.Engine {
 		go h.handleMessages(token)
 		h.handleConnections(c.Writer, c.Request)
 	})
+
+	pprof.Register(router, "pprof")
 
 	return router
 }

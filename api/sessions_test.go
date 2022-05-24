@@ -1,9 +1,9 @@
 package api_test
 
 import (
-	"database/sql"
 	"fmt"
 	"github.com/kokhno-nikolay/letsgochat/services"
+	"gorm.io/gorm"
 	"testing"
 
 	"github.com/kokhno-nikolay/letsgochat/api"
@@ -11,7 +11,7 @@ import (
 )
 
 func TestHandler_CheckUserSession(t *testing.T) {
-	repos := repository.NewRepositories(&sql.DB{})
+	repos := repository.NewRepositories(&gorm.DB{})
 	services := services.NewServices(services.Deps{Repos: repos})
 	handler := api.NewHandler(services)
 
@@ -50,7 +50,7 @@ func TestHandler_CheckUserSession(t *testing.T) {
 }
 
 func TestHandler_DeleteSession(t *testing.T) {
-	repos := repository.NewRepositories(&sql.DB{})
+	repos := repository.NewRepositories(&gorm.DB{})
 	services := services.NewServices(services.Deps{Repos: repos})
 	handler := api.NewHandler(services)
 
@@ -84,7 +84,7 @@ func TestHandler_DeleteSession(t *testing.T) {
 }
 
 func TestHandler_CheckUserToken(t *testing.T) {
-	repos := repository.NewRepositories(&sql.DB{})
+	repos := repository.NewRepositories(&gorm.DB{})
 	services := services.NewServices(services.Deps{Repos: repos})
 	handler := api.NewHandler(services)
 

@@ -1,7 +1,7 @@
 package api_test
 
 import (
-	"database/sql"
+	"gorm.io/gorm"
 	"net/http/httptest"
 	"testing"
 
@@ -15,18 +15,18 @@ import (
 )
 
 func TestNewHandler(t *testing.T) {
-	repos := repository.NewRepositories(&sql.DB{})
+	repos := repository.NewRepositories(&gorm.DB{})
 	services := services.NewServices(services.Deps{Repos: repos})
 	h := api.NewHandler(services)
 	require.IsType(t, &api.Handler{}, h)
 }
 
 func TestHandler_Init(t *testing.T) {
-	db, _, err := sqlmock.New()
+	_, _, err := sqlmock.New()
 	if err != nil {
 		assert.Nil(t, err)
 	}
-	repo := repository.NewRepositories(db)
+	repo := repository.NewRepositories(&gorm.DB{})
 	services := services.NewServices(services.Deps{Repos: repo})
 	handler := api.NewHandler(services)
 

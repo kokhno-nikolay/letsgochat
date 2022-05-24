@@ -1,17 +1,15 @@
 package postgres
 
 import (
-	"context"
-	"database/sql"
 	"github.com/kokhno-nikolay/letsgochat/models"
-	"time"
+	"gorm.io/gorm"
 )
 
 type MessagesRepo struct {
-	db *sql.DB
+	db *gorm.DB
 }
 
-func NewMessagesRepo(db *sql.DB) *MessagesRepo {
+func NewMessagesRepo(db *gorm.DB) *MessagesRepo {
 	return &MessagesRepo{
 		db: db,
 	}
@@ -20,40 +18,10 @@ func NewMessagesRepo(db *sql.DB) *MessagesRepo {
 func (r *MessagesRepo) GetAll() ([]models.ChatMessage, error) {
 	messages := make([]models.ChatMessage, 0)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	rows, err := r.db.QueryContext(ctx, "SELECT messages.text, users.username FROM messages JOIN users ON messages.user_id = users.id")
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		message := models.ChatMessage{}
-
-		err = rows.Scan(&message.Text, &message.Username)
-		if err != nil {
-			return nil, err
-		}
-
-		messages = append(messages, message)
-	}
-
-	return messages, nil
+	err := r.db.Find(&messages).Error
+	return messages, err
 }
 
 func (r *MessagesRepo) Create(message models.Message) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	query := "INSERT INTO messages (text, user_id) VALUES ($1, $2)"
-	stmt, err := r.db.PrepareContext(ctx, query)
-	if err != nil {
-		return err
-	}
-	defer stmt.Close()
-
-	_, err = stmt.ExecContext(ctx, message.Text, message.UserId)
-	return err
+	return r.db.Create(&message).Error
 }

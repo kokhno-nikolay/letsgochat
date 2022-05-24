@@ -1,12 +1,14 @@
 package main
 
 import (
+	"fmt"
+	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"log"
 	"net/http"
 	"os"
+	"runtime"
 
-	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 	"github.com/kokhno-nikolay/letsgochat/repository/postgres"
 )
 
@@ -17,13 +19,23 @@ import (
 // @host letsgochat.herokuapp.com
 // @BasePath /
 func main() {
-	db, err := postgres.NewClient(os.Getenv("POSTGRES_URL"))
+	runtime.GOMAXPROCS(1)
+
+	dns := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s",
+		os.Getenv("POSTGRES_HOST"),
+		os.Getenv("POSTGRES_USER"),
+		os.Getenv("POSTGRES_PASSWORD"),
+		os.Getenv("POSTGRES_DBNAME"),
+		os.Getenv("POSTGRES_PORT"),
+		os.Getenv("POSTGRES_SSLMODE"),
+	)
+	db, err := postgres.NewClient(dns)
 	if err != nil {
 		panic(err.Error())
 	}
 
-	handler := Wire(db)
-	router := handler.Init()
+	handlers := Wire(db)
+	router := handlers.Init()
 
 	router.LoadHTMLGlob("templates/*")
 	router.GET("/", func(c *gin.Context) {
