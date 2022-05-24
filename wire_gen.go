@@ -7,16 +7,16 @@
 package main
 
 import (
-	"database/sql"
 	"github.com/google/wire"
 	"github.com/kokhno-nikolay/letsgochat/api"
 	"github.com/kokhno-nikolay/letsgochat/repository"
 	"github.com/kokhno-nikolay/letsgochat/services"
+	"gorm.io/gorm"
 )
 
 // Injectors from wire.go:
 
-func Wire(db *sql.DB) *api.Handler {
+func Wire(db *gorm.DB) *api.Handler {
 	repositories := repository.NewRepositories(db)
 	services := services.NewServices(services.Deps{Repos: repositories})
 	handlers := api.NewHandler(services)
